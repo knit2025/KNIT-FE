@@ -6,11 +6,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './App.css'
 
 //페이지 import
-import MissionLog from "./pages/MissionLog/MissionLog";
-import MissionDetail from "./pages/MissionDetail/MissionDetail";
-import PhotoDetail from "./pages/PhotoDetail/PhotoDetail";
 import AnswerDetail from "./pages/AnswerDetail/AnswerDetail";
-import AddPhoto from "./pages/AddPhoto/AddPhoto";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -39,11 +35,7 @@ function App() {
       </p> */}
       <BrowserRouter>
       <Routes>
-      <Route path="/MissionLog" element={<MissionLog/>}/>
-      <Route path="/MissionDetail" element={<MissionDetail/>}/>
-      <Route path="/PhotoDetail" element={<PhotoDetail/>}/>
       <Route path="/AnswerDetail" element={<AnswerDetail/>}/>
-      <Route path="/AddPhoto" element={<AddPhoto/>}/>
       </Routes>
       </BrowserRouter>
     </>
