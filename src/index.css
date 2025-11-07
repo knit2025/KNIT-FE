@@ -1,3 +1,12 @@
+@import url('https://webfont.fontne.com/css/GabiaGosran.css');
+
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+
+@import 'tailwindcss';
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -26,11 +35,11 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  min-width: 390px;
+  min-height: 844px;
 }
 
-h1 {
+/* h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
@@ -52,7 +61,7 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
+}  */
 
 @media (prefers-color-scheme: light) {
   :root {
