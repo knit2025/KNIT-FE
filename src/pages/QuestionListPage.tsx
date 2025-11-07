@@ -1,24 +1,19 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { QuestionCardStack } from '../components/QuestionCard/QuestionCardStack';
-import type { Question, QuestionTarget } from '../types/question';
-import { useNavigate } from 'react-router-dom';
+import type { Question } from '../types/question';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import { AddBtnIcon } from '../assets/icons';
+import { PATHS } from '../routes';
 
-const categories: { label: string; value: QuestionTarget | 'all' }[] = [
-  { label: '답장할래요', value: 'all' },
-  { label: '아빠에게', value: '아빠에게' },
-  { label: '엄마에게', value: '엄마에게' },
-  { label: '모두에게', value: '모두에게' },
-  { label: '엄마에게', value: '엄마에게' },
-];
+// 카테고리 UI가 비활성 상태이므로 상수는 제거하여 TS noUnusedLocals 경고를 피합니다.
 
 export const QuestionListPage = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<QuestionTarget | 'all'>('all');
+  const location = useLocation() as any; // state + pathname 접근 단순 캐스팅
 
-  // 샘플 데이터 - 실제로는 API나 상태관리에서 가져옴
-  const [allQuestions] = useState<Question[]>([
+  // 샘플 데이터 - 실제로는 API/상태관리에서 가져옴
+  const [allQuestions, setAllQuestions] = useState<Question[]>([
     {
       id: '1',
       authorRole: '아들',
@@ -61,63 +56,45 @@ export const QuestionListPage = () => {
     },
   ]);
 
-  // 카테고리별 필터링
-  const filteredQuestions = useMemo(() => {
-    if (selectedCategory === 'all') return allQuestions;
-    return allQuestions.filter((q) => q.targetRole === selectedCategory);
-  }, [allQuestions, selectedCategory]);
-
-  const handleCardSelect = (question: Question) => {
-    // 라우팅으로 답변 작성 화면으로 이동
-    navigate(`/question/${question.id}/answer`, { state: { question } });
+  const handleAnswerClick = (question: Question) => {
+    navigate(PATHS.answer(question.id), { state: { question } });
   };
 
   const handleCreateQuestion = () => {
-    navigate('/question/create');
+    navigate(PATHS.createQuestion);
   };
 
+  // CreateQuestionPage에서 넘어온 신규 질문을 리스트에 추가하고 state를 정리
+  useEffect(() => {
+    const incoming = location.state?.newQuestion;
+    if (incoming) {
+      setAllQuestions((prev) => [incoming, ...prev]);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, location.pathname, navigate]);
+
   return (
-    <div className="min-h-screen p-6 bg-white pb-20">
+    <div className="min-h-screen p-6 bg-white pb-24">
       <Header />
         <h1 className='text-xl font-semibold'>가족들에게 궁금한 점을 물어보아요</h1>
-        <span className="block text-right text-[10px] before:content-['•'] before:mr-1 text-[#A9927F]">답장할래요</span>
-        {/* 카테고리 필터 */}
-        {/* <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
-          {categories.map((category) => (
-            <button
-              key={category.value}
-              onClick={() => setSelectedCategory(category.value)}
-              className={`
-                px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
-                ${
-                  selectedCategory === category.value
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }
-              `}
-            >
-              {category.label}
-            </button>
-          ))}
-        </div> */}
 
-      {filteredQuestions.length > 0 ? (
-        <QuestionCardStack
-          questions={filteredQuestions}
-          onCardSelect={handleCardSelect}
-        />
-      ) : (
-        <div className="flex items-center justify-center h-64">
-          <p className="text-gray-400">질문이 없습니다</p>
-        </div>
-      )}
+      <div className="mt-4 relative">
+        <span className="absolute top-2 right-4 z-10 text-[10px] before:content-['•'] before:mr-1 text-[#A9927F]">답장할래요</span>
+        {allQuestions.length > 0 ? (
+          <QuestionCardStack questions={allQuestions} onCardSelect={handleAnswerClick} />
+        ) : (
+          <div className="flex items-center justify-center h-64">
+            <p className="text-gray-400">질문이 없습니다</p>
+          </div>
+        )}
+      </div>
 
       {/* + 버튼 (질문 생성) */}
       <button
         type='button'
         onClick={handleCreateQuestion}
         aria-label='질문 만들기'
-        className='fixed right-4 bottom-4'
+        className='fixed z-40 right-3/24 bottom-1/8'
       >
         <AddBtnIcon size={60} aria-hidden="true" className='text-[#523E1B]'/>
       </button>

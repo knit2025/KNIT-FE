@@ -41,9 +41,10 @@ export const QuestionCardStack = ({
 
           const offset = index - currentIndex;
           const isVisible = offset <= 2;
-          // 겹쳐 보이도록 Y 이동/스케일을 완만하게 적용 (음수 스케일 방지)
-          const translateY = offset * 16; // px
-          const scale = Math.max(1 - offset * 0.05, 0.9);
+          // 겹침 간격 및 오버레이 진하기 설정
+          const translateY = offset * 145; // px
+          const overlayOpacity = Math.min(1, Math.max(0, offset * 0.25));
+          const overlayColor = '#E1B799';
           const zIndexOrder = index; // 먼저 렌더된 카드가 뒤로 가도록 낮은 값부터 부여
 
           return (
@@ -53,12 +54,11 @@ export const QuestionCardStack = ({
               onClick={() => onCardSelect(question)}
               style={{
                 position: 'absolute',
-                transform: `translateY(${translateY}px) scale(${scale})`,
+                transform: `translateY(${translateY}px)`,
                 zIndex: zIndexOrder,
-                opacity: isVisible ? 1 - offset * 0.15 : 0,
                 transition: 'all 0.3s ease-out',
-                width: 'calc(100% - 2rem)',
-                maxWidth: '400px',
+                ['--overlay-opacity' as any]: String(overlayOpacity),
+                ['--overlay-color' as any]: overlayColor,
               }}
               className={`
                 ${offset === 0 ? 'shadow-xl' : 'shadow-md'}

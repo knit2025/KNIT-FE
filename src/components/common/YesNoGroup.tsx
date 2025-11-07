@@ -1,7 +1,7 @@
 import OptionGroup from './OptionGroup';
 
 type YesNoGroupProps = {
-  value: boolean;
+  value?: boolean;
   onChange: (v: boolean) => void;
 };
 

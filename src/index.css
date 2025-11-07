@@ -18,6 +18,10 @@
 @theme {
   --font-gabia: 'GabiaGosran', sans-serif;
   --font-sans: 'SUIT', system-ui, sans-serif;
+  /* Color tokens for Tailwind utility classes (bg-*, text-*, border-*) */
+  --color-primary: #FEF1E8; /* peach surface */
+  --color-secondary: #F6E6DA; /* beige surface */
+  --color-brand: #523E1B; /* brand brown */
 }
 
 /* 전역 스타일은 별도 레이어로 */
@@ -28,6 +32,7 @@
     
     --color-text: #3A290D;
     --color-bg: #ffffff;
+    --primary-color: #FEF1E8;
     
     font-synthesis: none;
     text-rendering: optimizeLegibility;

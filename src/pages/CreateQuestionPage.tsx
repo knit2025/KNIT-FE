@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { QuestionTarget, CreateQuestionForm } from '../types/question';
+import type { QuestionTarget, CreateQuestionForm, Question } from '../types/question';
 import Header from '../components/Header/Header';
 import SectionCard from '../components/common/SectionCard';
 import OptionGroup from '../components/common/OptionGroup';
 import YesNoGroup from '../components/common/YesNoGroup';
 import TextAreaField from '../components/common/TextAreaField';
 import PrimaryButton from '../components/common/PrimaryButton';
+import { PATHS } from '../routes';
 
 const targetOptions: { label: string; value: QuestionTarget }[] = [
   { label: '아빠', value: '아빠에게' },
@@ -18,10 +19,7 @@ const targetOptions: { label: string; value: QuestionTarget }[] = [
 
 export const CreateQuestionPage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<Partial<CreateQuestionForm>>({
-    revealAuthor: false,
-    publicToAll: false,
-  });
+  const [formData, setFormData] = useState<Partial<CreateQuestionForm>>({});
 
   const handleTargetSelect = useCallback((target: QuestionTarget) => {
     setFormData((prev) => ({ ...prev, targetRole: target }));
@@ -41,9 +39,20 @@ export const CreateQuestionPage = () => {
 
   const handleSubmit = useCallback(() => {
     if (!formData.targetRole || !formData.content?.trim()) return;
-    console.log('질문 생성:', formData);
-    // API 호출
-    navigate('/');
+
+    const newQuestion: Question = {
+      id: String(Date.now()),
+      authorRole: '기타',
+      targetRole: formData.targetRole,
+      title: '',
+      content: formData.content.trim(),
+      revealAuthor: !!formData.revealAuthor,
+      publicToAll: !!formData.publicToAll,
+      createdAt: new Date(),
+    };
+
+    // 다음 페이지에서 받아서 리스트에 반영
+    navigate(PATHS.questionList, { state: { newQuestion } });
   }, [formData, navigate]);
 
   const canSubmit = useMemo(() => {
@@ -63,11 +72,11 @@ export const CreateQuestionPage = () => {
         </SectionCard>
 
         <SectionCard title="나를 드러낼까요?">
-          <YesNoGroup value={!!formData.revealAuthor} onChange={handleRevealAuthor} />
+          <YesNoGroup value={formData.revealAuthor} onChange={handleRevealAuthor} />
         </SectionCard>
 
         <SectionCard title="질문을 모두에게 공개할까요?">
-          <YesNoGroup value={!!formData.publicToAll} onChange={handlePublicToAll} />
+          <YesNoGroup value={formData.publicToAll} onChange={handlePublicToAll} />
         </SectionCard>
 
         <SectionCard title="편하게 물어보아요" variant="peach">

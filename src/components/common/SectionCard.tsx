@@ -7,7 +7,7 @@ type SectionCardProps = PropsWithChildren<{
 }>;
 
 export default function SectionCard({ title, variant = 'beige', className = '', children }: SectionCardProps) {
-  const bg = variant === 'peach' ? 'bg-[#FEF1E8]' : 'bg-[#F6E6DA]';
+  const bg = variant === 'peach' ? 'bg-primary' : 'bg-secondary';
   return (
     <div className={`flex flex-col p-6 rounded-3xl ${bg} ${className}`}>
       <h3 className={variant === 'peach' ? 'text-xs font-semibold mb-4' : 'text-sm font-medium mb-4'}>{title}</h3>
@@ -15,4 +15,3 @@ export default function SectionCard({ title, variant = 'beige', className = '', 
     </div>
   );
 }
-
