@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { QuestionListPage } from './pages/QuestionListPage';
+import { QuestionDetailPage } from './pages/QuestionDetailPage';
+import { CreateQuestionPage } from './pages/CreateQuestionPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+function QuestionDetailWrapper() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const question = location.state?.question;
+
+  const handleSubmit = (answer: string) => {
+    console.log('답변 제출:', answer);
+    // 실제로는 API 호출하여 답변 저장
+    navigate('/');
+  };
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  if (!question) {
+    navigate('/');
+    return null;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <QuestionDetailPage
+      question={question}
+      onSubmit={handleSubmit}
+      onBack={handleBack}
+    />
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<QuestionListPage />} />
+        <Route path="/question/create" element={<CreateQuestionPage />} />
+        <Route path="/question/:id/answer" element={<QuestionDetailWrapper />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
