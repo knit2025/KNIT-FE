@@ -1,57 +1,51 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { QuestionListPage } from './pages/QuestionListPage';
+import { QuestionDetailPage } from './pages/QuestionDetailPage';
+import { CreateQuestionPage } from './pages/CreateQuestionPage';
+import { TempPage } from './pages/TempPage';
+import { PATHS } from './routes';
 
-//페이지 import
-import AnswerDetail from "./pages/AnswerDetail/AnswerDetail";
-import AddPhoto from "./pages/AddPhoto/AddPhoto";
-import MissionLog from "./pages/MissionLog/MissionLog";
-// import MissionDetail from "./pages/MissionDetail/MissionDetail";
-// import PhotoDetail from "./pages/PhotoDetail/PhotoDetail";
-// import AnswerDetail from "./pages/AnswerDetail/AnswerDetail";
-// import AddPhoto from "./pages/AddPhoto/AddPhoto";
+function QuestionDetailWrapper() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const question = location.state?.question;
 
-function App() {
-  // const [count, setCount] = useState(0)
+  const handleSubmit = (answer: string) => {
+    console.log('답변 제출:', answer);
+    // 실제로는 API 호출하여 답변 저장
+    navigate(PATHS.questionList);
+  };
+
+  const handleBack = () => {
+    navigate(PATHS.questionList);
+  };
+
+  if (!question) {
+    navigate(PATHS.questionList);
+    return null;
+  }
 
   return (
-    <>
-      {/* <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
-      <BrowserRouter>
-      <Routes>
-      <Route path="/AnswerDetail" element={<AnswerDetail/>}/>
-      <Route path="/AddPhoto" element={<AddPhoto/>}/>
-      <Route path="/MissionLog" element={<MissionLog/>}/>
-      {/* <Route path="/MissionDetail" element={<MissionDetail/>}/>
-      <Route path="/PhotoDetail" element={<PhotoDetail/>}/>
-      <Route path="/AnswerDetail" element={<AnswerDetail/>}/>
-      <Route path="/AddPhoto" element={<AddPhoto/>}/> */}
-      </Routes>
-      </BrowserRouter>
-    </>
-  )
+    <QuestionDetailPage
+      question={question}
+      onSubmit={handleSubmit}
+      onBack={handleBack}
+    />
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to={PATHS.questionList} replace />} />
+        <Route path={PATHS.questionList} element={<QuestionListPage />} />
+        <Route path={PATHS.createQuestion} element={<CreateQuestionPage />} />
+        <Route path={PATHS.temp} element={<TempPage />} />
+        <Route path={PATHS.answer()} element={<QuestionDetailWrapper />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
