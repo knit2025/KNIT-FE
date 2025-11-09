@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 
+/* 로컬 폰트 선언 */
 @font-face {
   font-family: 'SUIT';
   src: url('/fonts/SUIT-Variable.woff2') format('woff2-variations');
@@ -18,7 +19,7 @@
 @theme {
   --font-gabia: 'GabiaGosran', sans-serif;
   --font-sans: 'SUIT', system-ui, sans-serif;
-  /* Color tokens for Tailwind utility classes (bg-*, text-*, border-*) */
+  /* tailwindcss 유틸리티로 노출됨. (bg-*, text-*, border-*) */
   --color-primary: #FEF1E8; /* peach surface */
   --color-secondary: #F6E6DA; /* beige surface */
   --color-brand: #523E1B; /* brand brown */
