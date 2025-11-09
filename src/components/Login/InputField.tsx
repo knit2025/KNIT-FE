@@ -1,7 +1,15 @@
 import React from "react";
 
-const InputField: React.FC = () => {
-  return <div></div>;
+interface FiledNameProps {
+  feildName: string;
+}
+
+const InputField: React.FC<FiledNameProps> = ({ feildName }) => {
+  return (
+    <>
+      <input placeholder={feildName}></input>
+    </>
+  );
 };
 
 export default InputField;
