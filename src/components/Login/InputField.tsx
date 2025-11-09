@@ -1,10 +1,10 @@
 import React from "react";
 
-interface FiledNameProps {
+interface FeildNameProps {
   feildName: string;
 }
 
-const InputField: React.FC<FiledNameProps> = ({ feildName }) => {
+const InputField: React.FC<FeildNameProps> = ({ feildName }) => {
   return (
     <>
       <input placeholder={feildName}></input>
