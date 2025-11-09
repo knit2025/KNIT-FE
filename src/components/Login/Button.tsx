@@ -1,7 +1,15 @@
 import React from "react";
 
-const Button: React.FC = () => {
-  return <div></div>;
+interface ButtonProps {
+  buttonName: string;
+}
+
+const Button: React.FC<ButtonProps> = ({ buttonName }) => {
+  return (
+    <>
+      <div>{buttonName}</div>
+    </>
+  );
 };
 
 export default Button;
