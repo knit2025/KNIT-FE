@@ -26,6 +26,7 @@ import { MissionPage } from "./pages/MissionPage";
 import { TodayMissionPage } from "./pages/TodayMissionPage";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
+import FamilyCode from "./pages/FamilyCode/FamilyCode";
 
 // 질문 상세 진입 시 location.state를 기대하는 기존 래퍼 (feature 코드 유지)
 function QuestionDetailWrapper() {
@@ -84,6 +85,7 @@ function App() {
         <Route path="/AddPhoto" element={<AddPhoto />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/SignUp" element={<SignUp />} />
+        <Route path="/FamilyCode" element={<FamilyCode />} />
 
         {/* 404 → 기본 라우트로 */}
         <Route
