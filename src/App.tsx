@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import './App.css';
+// import './App.css';
 
 // ── [feature 브랜치] 질문 관련 페이지
 import { QuestionListPage } from './pages/QuestionListPage';
@@ -73,3 +73,4 @@ function App() {
     </Router>
   );
 }
+export default App;

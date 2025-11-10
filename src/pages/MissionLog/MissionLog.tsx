@@ -108,6 +108,7 @@ const MissionLog = () => {
   </div>
 </div>
 
+
   <button type='button' className='absolute right-[23px] bottom-[calc(100px+16px)] cursor-pointer z-50' onClick={handleClick}>
     <img src={PlusIcon} alt="PlusIcon" className='w-[36px] h-[36px]'/>
   </button>
