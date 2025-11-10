@@ -8,6 +8,7 @@ interface QuestionCardProps {
   editable?: boolean;
   answerValue?: string;
   onChangeAnswer?: (value: string) => void;
+  onAnswerClick?: () => void;
 }
 
 export const QuestionCard = ({
@@ -18,6 +19,7 @@ export const QuestionCard = ({
   editable = false,
   answerValue,
   onChangeAnswer,
+  onAnswerClick,
 }: QuestionCardProps) => {
   return (
     <div
@@ -39,13 +41,18 @@ export const QuestionCard = ({
         <h3 className="text-sm font-semibold text-brand">
           {question.targetRole} {question.authorRole}이 궁금한 점
         </h3>
-        {!editable && 
-          <button 
-            onClick={onClick}
-            className='text-[10px] cursor-pointer rounded-md font-semibold bg-white px-4'>
+        {!editable && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              (onAnswerClick ?? onClick)?.();
+            }}
+            className='text-[10px] cursor-pointer rounded-md font-semibold bg-white px-4'
+            aria-label='답장 하기'
+          >
             답장 하기
           </button>
-          }
+        )}
       </div>
       
       {/* 답변하기 버튼 */}

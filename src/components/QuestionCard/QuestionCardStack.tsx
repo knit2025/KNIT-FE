@@ -13,6 +13,7 @@ export const QuestionCardStack = ({
   onCardSelect
 }: QuestionCardStackProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
 
   const swipeHandlers = useSwipe({
     onSwipeUp: () => {
@@ -32,6 +33,14 @@ export const QuestionCardStack = ({
       className="relative h-[calc(100vh-200px)] w-full overflow-hidden"
       {...swipeHandlers}
     >
+      {focusedId && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40"
+          onClick={() => setFocusedId(null)}
+          aria-hidden
+        />
+      )}
+
       <div className="absolute inset-0 flex items-center justify-center p-4">
         {questions.map((question, index) => {
           // 현재 카드부터 최대 3개까지만 렌더링 (성능 최적화)
@@ -45,23 +54,27 @@ export const QuestionCardStack = ({
           const translateY = offset * 145; // px
           const overlayOpacity = Math.min(1, Math.max(0, offset * 0.25));
           const overlayColor = '#E1B799';
-          const zIndexOrder = index; // 먼저 렌더된 카드가 뒤로 가도록 낮은 값부터 부여
+          const isFocused = focusedId === question.id;
+          const baseZ = index;
+          const zIndexOrder = isFocused ? 50 : baseZ; // 포커스 카드는 오버레이 위로
+          const transform = `translateY(${translateY}px)` + (isFocused ? ' scale(1.02)' : '');
 
           return (
             <QuestionCard
               key={question.id}
               question={question}
-              onClick={() => onCardSelect(question)}
+              onClick={() => (focusedId === question.id ? onCardSelect(question) : setFocusedId(question.id))}
+              onAnswerClick={() => onCardSelect(question)}
               style={{
                 position: 'absolute',
-                transform: `translateY(${translateY}px)`,
+                transform,
                 zIndex: zIndexOrder,
                 transition: 'all 0.3s ease-out',
-                ['--overlay-opacity' as any]: String(overlayOpacity),
+                ['--overlay-opacity' as any]: isFocused ? '0' : String(overlayOpacity),
                 ['--overlay-color' as any]: overlayColor,
               }}
               className={`
-                ${offset === 0 ? 'shadow-xl' : 'shadow-md'}
+                ${isFocused ? 'shadow-2xl' : offset === 0 ? 'shadow-xl' : 'shadow-md'}
                 ${!isVisible ? 'pointer-events-none' : ''}
               `}
             />

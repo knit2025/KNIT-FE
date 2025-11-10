@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type { Question } from '../types/question';
 import Header from '../components/Header/Header';
 import { QuestionCard } from '../components/QuestionCard/QuestionCard';
-import SelectableButton from '../components/common/SelectableButton';
 import PrimaryButton from '../components/common/PrimaryButton';
 
 interface QuestionDetailPageProps {
