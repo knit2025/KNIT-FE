@@ -3,7 +3,7 @@
 // import viteLogo from '/vite.svg'
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import './App.css'
+// import './App.css'
 
 //페이지 import
 import MissionLog from "./pages/MissionLog/MissionLog";
