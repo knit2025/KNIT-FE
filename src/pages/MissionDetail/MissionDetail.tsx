@@ -7,7 +7,7 @@ import "../../styles/Global.css";
 
 const MissionDetail = () => {
   return (
-    <div className='relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden'>
+    <div className='min-h-screen relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden'>
       <img src={KNITLG} alt="KNITLG" className='pt-[43px] pl-[33px] w-[100px]'/>
       <div className='pl-[23px] text-left ml-2 mt-5 mb-[36px] text-[18px] font-semibold text-[#3A290D]'>우리가족이 함께한 미션</div>
       <div className='gap-2 flex pr-[23px] pl-[23px] mb-[30px]'>

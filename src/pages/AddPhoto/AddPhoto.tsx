@@ -36,7 +36,7 @@ const formData = {
 
 // const AddPhoto = () => {
   return (
-    <div className='relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden'>
+    <div className='relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden min-h-screen'>
       <img src={KNITLG} alt="KNITLG" className='pt-[43px] pl-[33px] w-[100px]'/>
       <div className='pl-[23px] text-left ml-2 mt-5 mb-[36px] text-[18px] font-semibold text-[#3A290D]'>추억 더하기</div>
         
