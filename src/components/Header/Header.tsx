@@ -1,7 +1,6 @@
+import KNITLG from "../../assets/Knit.png";
 export default function Header(){
   return(
-    <header className="font-gabia mt-10 mb-10 text-[#826F5F] font-normal text-5xl">
-      KNIT
-    </header>
+    <img src={KNITLG} alt="KNITLG" className='relative top-[18px] -left-px pt-[43px] pl-[33px] w-[100px]'/>
   )
 }

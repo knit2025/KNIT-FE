@@ -8,12 +8,13 @@ type TextAreaFieldProps = {
 
 export default function TextAreaField({ label, value, onChange, className = '', ...rest }: TextAreaFieldProps) {
   return (
-    <div className="bg-transparent">
-      <p className="text-[11px] font-gabia">{label}</p>
+    <div className="bg-transparent flex flex-col h-full">
+      <p className="text-[11px] font-gabia text-[#3A290D] mb-2">{label}</p>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full h-30 resize-none outline-none ${className}`}
+        className={`flex-1 w-full text-[12px] text-[#3A290D] resize-none outline-none bg-transparent ${className}`}
+        placeholder="질문 내용을 입력해주세요"
         {...rest}
       />
     </div>
