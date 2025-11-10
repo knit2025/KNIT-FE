@@ -74,7 +74,7 @@ export const QuestionListPage = () => {
   }, [location.state, location.pathname, navigate]);
 
   return (
-    <div className="relative w-[390px] min-h-screen mx-auto bg-white overflow-hidden">
+    <div className="relative w-[390px] text-left min-h-screen mx-auto bg-white overflow-hidden">
       {/* 헤더 영역 */}
       <Header/>
 

@@ -25,7 +25,7 @@ export const QuestionDetailPage = ({
   };
 
   return (
-    <div className="relative w-[390px] min-h-screen mx-auto bg-white">
+    <div className="relative w-[390px] min-h-screen mx-auto text-left bg-white">
       <Header/>
 
       {/* 제목 */}
