@@ -3,5 +3,6 @@ export const PATHS = {
   createQuestion: '/question/create',
   temp: '/question/temp',
   answer: (id: string | number = ':id') => `/question/${id}/answer`,
+  mission: '/mission',
 } as const;
 
