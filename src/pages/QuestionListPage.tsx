@@ -7,7 +7,6 @@ import PlusIcon from '../assets/add 2.png'
 import { PATHS } from '../routes';
 import Footer from '../components/Footer/Footer';
 
-// 카테고리 UI가 비활성 상태이므로 상수는 제거하여 TS noUnusedLocals 경고를 피합니다.
 
 export const QuestionListPage = () => {
   const navigate = useNavigate();

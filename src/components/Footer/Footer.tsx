@@ -34,7 +34,12 @@ const Footer: React.FC = () => {
           <img src={storage} className='w-[29px] h-[29px] object-contain cursor-pointer'/>
           <div className='mt-[2px] text-[8px] font-semibold text-[#826F5F]'>보관함</div>
         </div>
-        <div>
+        <div
+          className='cursor-pointer'
+          onClick={()=> navigate(PATHS.mission)}
+          role='button'
+          aria-label='미션으로 이동'
+        >
           <img src={star} className='w-[30px] h-[30px] object-contain cursor-pointer'/>
           <div className='mt-[2px] text-[8px] font-semibold text-[#826F5F]'>미션</div>
         </div>

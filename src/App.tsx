@@ -15,6 +15,7 @@ import MissionDetail from './pages/MissionDetail/MissionDetail';
 import PhotoDetail from './pages/PhotoDetail/PhotoDetail';
 import AnswerDetail from './pages/AnswerDetail/AnswerDetail';
 import AddPhoto from './pages/AddPhoto/AddPhoto';
+import { MissionPage } from './pages/MissionPage';
 
 // 질문 상세 진입 시 location.state를 기대하는 기존 래퍼 (feature 코드 유지)
 function QuestionDetailWrapper() {
@@ -61,6 +62,7 @@ function App() {
         <Route path={PATHS.answer()} element={<QuestionDetailWrapper />} />
 
         {/* 미션/포토/답변(develop) */}
+        <Route path={PATHS.mission} element={<MissionPage />} />
         <Route path="/MissionLog" element={<MissionLog />} />
         <Route path="/MissionDetail" element={<MissionDetail />} />
         <Route path="/PhotoDetail" element={<PhotoDetail />} />
