@@ -1,7 +1,15 @@
 import React from "react";
 
-const RoleCard: React.FC = () => {
-  return <div></div>;
+interface roleProps {
+  role: string;
+}
+
+const RoleCard: React.FC<roleProps> = ({ role }) => {
+  return (
+    <div>
+      <p>{role}</p>
+    </div>
+  );
 };
 
 export default RoleCard;
