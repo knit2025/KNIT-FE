@@ -19,14 +19,14 @@ const MissionDetail = () => {
         <div className='ml-[23px] mr-[23px]'>
           <div className='mt-[30px] font-bold text-[#3A290D] text-[14px]'>미션 후 소감</div>
           <div>
-          <div className='text-[12px] text-[#3A290D] mb-2 mt-5'>엄마</div>
-                    <div className='text-black text-[11px] w-70'>오늘 아침 모두가 바빠 보이길래, 출근·등교 전 
+          <div className='text-[13px] font-gabia text-[#3A290D] mb-2 mt-5'>엄마</div>
+                    <div className='text-black text-[11px] font-gabia w-70'>오늘 아침 모두가 바빠 보이길래, 출근·등교 전 
 간단하지만 든든한 아침을 챙겨줬어요. 작은 일이지만, 하루를 기분 좋게 시작하는 데 
 도움이 되었으면 좋겠어요</div>
         </div>
                   <div>
-          <div className='text-[12px] text-[#3A290D] mb-2 mt-5'>엄마</div>
-                    <div className='text-black text-[11px] w-70'>오늘 아침 모두가 바빠 보이길래, 출근·등교 전 
+          <div className='text-[13px] font-gabia text-[#3A290D] mb-2 mt-5'>엄마</div>
+                    <div className='text-black font-gabia text-[11px] w-70'>오늘 아침 모두가 바빠 보이길래, 출근·등교 전 
 간단하지만 든든한 아침을 챙겨줬어요. 작은 일이지만, 하루를 기분 좋게 시작하는 데 
 도움이 되었으면 좋겠어요</div>
         </div>

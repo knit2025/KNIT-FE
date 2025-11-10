@@ -84,7 +84,7 @@ const formData = {
               placeholder='답변을 입력해주세요'
               value={description} 
               onChange={(e) => setDescription(e.target.value)} 
-              className='w-full text-[12px] text-[#3A290D] font-gosran focus:outline-none placeholder:text-[#ADADAD]'
+              className='font-gabia w-full text-[12px] text-[#3A290D] font-gosran focus:outline-none placeholder:text-[#ADADAD]'
             />
           </div>
           
