@@ -3,7 +3,7 @@
 // import viteLogo from '/vite.svg'
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import './App.css'
+import "./App.css";
 
 //페이지 import
 import MissionLog from "./pages/MissionLog/MissionLog";
@@ -11,6 +11,7 @@ import MissionDetail from "./pages/MissionDetail/MissionDetail";
 import PhotoDetail from "./pages/PhotoDetail/PhotoDetail";
 import AnswerDetail from "./pages/AnswerDetail/AnswerDetail";
 import AddPhoto from "./pages/AddPhoto/AddPhoto";
+import Login from "./pages/Login/Login";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -38,16 +39,17 @@ function App() {
         Click on the Vite and React logos to learn more
       </p> */}
       <BrowserRouter>
-      <Routes>
-      <Route path="/MissionLog" element={<MissionLog/>}/>
-      <Route path="/MissionDetail" element={<MissionDetail/>}/>
-      <Route path="/PhotoDetail" element={<PhotoDetail/>}/>
-      <Route path="/AnswerDetail" element={<AnswerDetail/>}/>
-      <Route path="/AddPhoto" element={<AddPhoto/>}/>
-      </Routes>
+        <Routes>
+          <Route path="/MissionLog" element={<MissionLog />} />
+          <Route path="/MissionDetail" element={<MissionDetail />} />
+          <Route path="/PhotoDetail" element={<PhotoDetail />} />
+          <Route path="/AnswerDetail" element={<AnswerDetail />} />
+          <Route path="/AddPhoto" element={<AddPhoto />} />
+          <Route path="/Login" element={<Login />} />
+        </Routes>
       </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
