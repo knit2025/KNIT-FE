@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
 import missionMarker from "../assets/missionMarker.svg";
+import { PATHS } from '../routes';
+import { useNavigate } from 'react-router-dom';
 
 interface Mission {
   id: string;
@@ -11,6 +13,8 @@ interface Mission {
 }
 
 export const MissionPage = () => {
+  const navigate = useNavigate();
+
   const [missions] = useState<Mission[]>([
     {
       id: '1',
@@ -38,9 +42,9 @@ export const MissionPage = () => {
     },
   ]);
 
+
   return (
     <div className="relative text-left w-[390px] min-h-screen mx-auto bg-white overflow-hidden">
-      {/* 헤더 */}
       <Header />
 
       {/* 오늘의 미션 카드 */}
@@ -56,7 +60,10 @@ export const MissionPage = () => {
           가족들과 함께 사진을 찍어보아요
         </p>
 
-        <button className="w-[285px] h-[37px] bg-white rounded-[17px] flex items-center justify-center">
+        <button 
+          className="w-[285px] h-[37px] bg-white rounded-[17px] flex items-center justify-center cursor-pointer"
+          onClick={()=> navigate(PATHS.todayMission)}
+        >
           <span className="text-[16px] font-semibold text-[#3A290D]">미션 인증</span>
         </button>
       </div>
@@ -91,7 +98,6 @@ export const MissionPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
