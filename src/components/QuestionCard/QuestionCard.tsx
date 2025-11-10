@@ -26,7 +26,7 @@ export const QuestionCard = ({
       onClick={onClick}
       style={style}
       className={`
-        bg-primary rounded-[14px] min-w-11/12 p-6
+        bg-primary rounded-[14px] w-full h-full px-[29px] pt-[25px]
         cursor-pointer transition-all
         relative overflow-hidden
         before:content-[''] before:pointer-events-none before:absolute before:inset-0 before:rounded-[14px] before:z-0
@@ -34,58 +34,59 @@ export const QuestionCard = ({
         ${className}
       `}
     >
-      <div className="relative z-10">
+      <div className="relative z-10 h-full flex flex-col">
       {/* 헤더 */}
-      
-      <div className="flex justify-between mb-4">
-        <h3 className="text-sm font-semibold text-brand">
-          {question.targetRole} {question.authorRole}이 궁금한 점
-        </h3>
-        {!editable && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              (onAnswerClick ?? onClick)?.();
-            }}
-            className='text-[10px] cursor-pointer rounded-md font-semibold bg-white px-4'
-            aria-label='답장 하기'
-          >
-            답장 하기
-          </button>
-        )}
-      </div>
-      
-      {/* 답변하기 버튼 */}
-      {/* 본문 영역: 라벨/구분선 고정 노출 */}
-      <div className="space-y-4">
-        {/* 질문 내용 */}
-        <section>
-          <p className="text-[11px] font-gabia py-3 text-brand/70">질문 내용</p>
-          <p className="mt-1 text-sm  text-brand/80 whitespace-pre-wrap min-h-48">
-            {question.content || ''}
-          </p>
-        </section>
-
-        <hr className="border-brand/20" />
-
-        {/* 답변 내용 */}
-        <section>
-          <p className="text-[11px] font-gabia py-3 text-brand/70">답변 내용</p>
-          {editable ? (
-            <textarea
-              value={answerValue ?? question.answer ?? ''}
-              onChange={(e) => onChangeAnswer?.(e.target.value)}
-              placeholder="여기를 눌러 답변을 입력해주세요!"
-              className="mt-1 w-full text-sm text-brand/80 min-h-48 bg-transparent resize-none outline-none"
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <p className="mt-1 text-sm text-brand/50 whitespace-pre-wrap min-h-48">
-              {question.answer?.trim() ? question.answer : '아직 답변을 작성되지 않았어요.'}
-            </p>
+        <div className="flex justify-between mb-[25px]">
+          <h3 className="text-[13px] font-semibold tracking-[0.05em] text-brand">
+            {question.targetRole} {question.authorRole}이 궁금한 점
+          </h3>
+          {!editable && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                (onAnswerClick ?? onClick)?.();
+              }}
+              className='text-[10px] cursor-pointer rounded-md font-semibold bg-white px-4 py-1'
+              aria-label='답장 하기'
+            >
+              답장 하기
+            </button>
           )}
-        </section>
-      </div>
+        </div>
+
+        {/* 본문 영역 */}
+        <div className="flex-1 flex flex-col">
+          {/* 질문 내용 섹션 */}
+          <section className="flex-2 flex flex-col pb-[15px]">
+            <p className="text-[11px] text-left font-gabia mb-2 text-brand/70 select-none">질문 내용</p>
+            <div className="flex-1 overflow-y-auto">
+              <p className="text-[12px] text-left text-brand/80 whitespace-pre-wrap select-none">
+                {question.content || ''}
+              </p>
+            </div>
+          </section>
+
+          {/* 구분선 */}
+          <hr className="border-[#A6A6A6]" />
+
+          {/* 답변 내용 섹션 */}
+          <section className="flex-3 flex flex-col pt-[15px]">
+            <p className="text-[11px] text-left font-gabia mb-2 text-brand/70 select-none">답변 내용</p>
+            {editable ? (
+              <textarea
+                value={answerValue ?? question.answer ?? ''}
+                onChange={(e) => onChangeAnswer?.(e.target.value)}
+                placeholder="여기를 눌러 답변을 입력해주세요!"
+                className="flex-1 w-full text-[12px] text-left text-brand/80 bg-transparent resize-none outline-none overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <p className="flex-1 text-left text-[12px] text-brand/50 whitespace-pre-wrap overflow-y-auto select-none">
+                {question.answer?.trim() ? question.answer : '아직 답변을 작성되지 않았어요.'}
+              </p>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

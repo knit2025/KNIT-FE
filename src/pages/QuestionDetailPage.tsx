@@ -2,7 +2,8 @@ import { useState } from 'react';
 import type { Question } from '../types/question';
 import Header from '../components/Header/Header';
 import { QuestionCard } from '../components/QuestionCard/QuestionCard';
-import PrimaryButton from '../components/common/PrimaryButton';
+import PrimaryButton from '../components/Question/PrimaryButton';
+import Footer from '../components/Footer/Footer';
 
 interface QuestionDetailPageProps {
   question: Question;
@@ -24,13 +25,16 @@ export const QuestionDetailPage = ({
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 flex flex-col">
+    <div className="relative w-[390px] min-h-screen mx-auto bg-white">
       <Header/>
-      <h1 className="text-2xl font-bold mb-8">
+
+      {/* 제목 */}
+      <h1 className="absolute top-[136px] left-[26px] text-[20px] font-semibold text-[#3A290D]">
         당신의 이야기를 나눠주세요
       </h1>
 
-      <div className="mb-6">
+      {/* 질문 카드 */}
+      <div className="absolute top-[193px] left-[25px] w-[340px] h-[443px]">
         <QuestionCard
           question={question}
           editable
@@ -39,16 +43,14 @@ export const QuestionDetailPage = ({
         />
       </div>
 
-      <PrimaryButton onClick={handleSubmit} disabled={!answer?.trim()}>
-        작성 완료
-      </PrimaryButton>
+      {/* 작성 완료 버튼 */}
+      <div className="absolute top-[680px] left-[46px] w-[298px]">
+        <PrimaryButton onClick={handleSubmit} disabled={!answer?.trim()}>
+          작성 완료
+        </PrimaryButton>
+      </div>
 
-
-
-      {/* 하단 네비게이션 - 실제 구현 시 별도 컴포넌트로 분리 */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-200 flex justify-around p-4">
-        <button onClick={onBack} className="p-2">뒤로</button>
-      </nav>
+      <Footer />
     </div>
   );
 };

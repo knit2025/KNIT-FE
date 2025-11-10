@@ -30,7 +30,7 @@ export const QuestionCardStack = ({
 
   return (
     <div
-      className="relative h-[calc(100vh-200px)] w-full overflow-hidden"
+      className="relative w-full h-full overflow-visible"
       {...swipeHandlers}
     >
       {focusedId && (
@@ -41,22 +41,22 @@ export const QuestionCardStack = ({
         />
       )}
 
-      <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="relative w-full h-full">
         {questions.map((question, index) => {
-          // 현재 카드부터 최대 3개까지만 렌더링 (성능 최적화)
-          if (index < currentIndex || index > currentIndex + 2) {
+          // 현재 카드부터 최대 4개까지 렌더링
+          if (index < currentIndex || index > currentIndex + 3) {
             return null;
           }
 
           const offset = index - currentIndex;
-          const isVisible = offset <= 2;
-          // 겹침 간격 및 오버레이 진하기 설정
-          const translateY = offset * 145; // px
-          const overlayOpacity = Math.min(1, Math.max(0, offset * 0.25));
+          const isVisible = offset <= 3;
+          // 디자인 시안 기준: 카드 간격 약 142~155px (평균 149px)
+          const translateY = offset * 149; // px
+          const overlayOpacity = Math.min(1, Math.max(0, offset * 0.2));
           const overlayColor = '#E1B799';
           const isFocused = focusedId === question.id;
           const baseZ = index;
-          const zIndexOrder = isFocused ? 50 : baseZ; // 포커스 카드는 오버레이 위로
+          const zIndexOrder = isFocused ? 50 : baseZ;
           const transform = `translateY(${translateY}px)` + (isFocused ? ' scale(1.02)' : '');
 
           return (
@@ -67,9 +67,12 @@ export const QuestionCardStack = ({
               onAnswerClick={() => onCardSelect(question)}
               style={{
                 position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '340px',
                 transform,
                 zIndex: zIndexOrder,
-                transition: 'all 0.3s ease-out',
+                transition: 'all 0.2s ease-out',
                 ['--overlay-opacity' as any]: isFocused ? '0' : String(overlayOpacity),
                 ['--overlay-color' as any]: overlayColor,
               }}

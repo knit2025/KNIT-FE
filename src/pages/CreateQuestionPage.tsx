@@ -2,11 +2,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { QuestionTarget, CreateQuestionForm, Question } from '../types/question';
 import Header from '../components/Header/Header';
-import SectionCard from '../components/common/SectionCard';
-import OptionGroup from '../components/common/OptionGroup';
-import YesNoGroup from '../components/common/YesNoGroup';
-import TextAreaField from '../components/common/TextAreaField';
-import PrimaryButton from '../components/common/PrimaryButton';
+import SectionCard from '../components/Question/SectionCard';
+import OptionGroup, { YesNoGroup } from '../components/Question/OptionGroup';
+import TextAreaField from '../components/Question/TextAreaField';
+import PrimaryButton from '../components/Question/PrimaryButton';
+import Footer from '../components/Footer/Footer';
 import { PATHS } from '../routes';
 
 const targetOptions: { label: string; value: QuestionTarget }[] = [
@@ -60,35 +60,61 @@ export const CreateQuestionPage = () => {
   }, [formData.targetRole, formData.content]);
 
   return (
-    <div className="min-h-screen bg-white p-6 flex flex-col">
+    <div className="relative w-[390px] min-h-screen mx-auto bg-white overflow-hidden text-left">
+      {/* 헤더 */}
       <Header />
-        <h1 className="mb-8 text-2xl font-bold">
-          궁금했던 이야기를 천천히 꺼내볼까요?
-        </h1>
 
-      <div className="flex-1 flex flex-col gap-6">
-        <SectionCard title="누구에게 질문하고 싶으신가요?">
-          <OptionGroup options={targetOptions} value={formData.targetRole} onChange={handleTargetSelect} />
-        </SectionCard>
+      {/* 제목 */}
+      <h1 className="absolute top-[131px] left-[30px] text-[20px] font-semibold text-[#3A290D]">
+        궁금했던 이야기들 천천히 꺼내볼까요?
+      </h1>
 
-        <SectionCard title="나를 드러낼까요?">
-          <YesNoGroup value={formData.revealAuthor} onChange={handleRevealAuthor} />
-        </SectionCard>
-
-        <SectionCard title="질문을 모두에게 공개할까요?">
-          <YesNoGroup value={formData.publicToAll} onChange={handlePublicToAll} />
-        </SectionCard>
-
-        <SectionCard title="편하게 물어보아요" variant="peach">
-          <TextAreaField label="질문 내용" value={formData.content || ''} onChange={handleContentChange} />
+      {/* 섹션: 누구에게 질문 - 79px 높이 */}
+      <div className="absolute top-[190px] left-[25px] w-[340px] h-[79px]">
+        <SectionCard title="누구에게 질문하고 싶으신가요?" className="rounded-[14px] h-full">
+          <OptionGroup
+            options={targetOptions}
+            value={formData.targetRole}
+            onChange={handleTargetSelect}
+          />
         </SectionCard>
       </div>
 
-      <div className="mt-2">
+      {/* 섹션: 나를 드러낼까요 - 79px 높이 */}
+      <div className="absolute top-[284px] left-[25px] w-[340px] h-[79px]">
+        <SectionCard title="나를 드러낼까요?" className="rounded-[14px] h-full">
+          <YesNoGroup value={formData.revealAuthor} onChange={handleRevealAuthor} />
+        </SectionCard>
+      </div>
+
+      {/* 섹션: 모두에게 공개 - 79px 높이 */}
+      <div className="absolute top-[378px] left-[25px] w-[340px] h-[79px]">
+        <SectionCard title="질문을 모두에게 공개할까요?" className="rounded-[14px] h-full">
+          <YesNoGroup value={formData.publicToAll} onChange={handlePublicToAll} />
+        </SectionCard>
+      </div>
+
+      {/* 섹션: 질문 내용 - 188px 높이 */}
+      <div className="absolute top-[476px] left-[25px] w-[340px] h-[188px]">
+        <SectionCard title="편하게 물어보아요" variant="peach" className="rounded-[14px] h-full">
+          <TextAreaField
+            label="질문 내용"
+            value={formData.content || ''}
+            onChange={handleContentChange}
+            className="bg-transparent"
+          />
+        </SectionCard>
+      </div>
+
+      {/* 생성 완료 버튼 - 40px 높이 */}
+      <div className="absolute top-[682px] left-[46px] w-[298px] h-[40px]">
         <PrimaryButton onClick={handleSubmit} disabled={!canSubmit}>
           생성 완료
         </PrimaryButton>
       </div>
+
+      {/* 하단 푸터 */}
+      <Footer />
     </div>
   );
 };
