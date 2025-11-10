@@ -1,36 +1,36 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /* 로컬 폰트 선언 */
 @font-face {
-  font-family: 'SUIT';
-  src: url('/fonts/SUIT-Variable.woff2') format('woff2-variations');
+  font-family: "SUIT";
+  src: url("/fonts/SUIT-Variable.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'GabiaGosran';
-  src: url('/fonts/GabiaGosran.otf') format('opentype');
+  font-family: "GabiaGosran";
+  src: url("/fonts/GabiaGosran.otf") format("opentype");
   font-weight: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'RoundedFixedsys';
-  src: url('/fonts/DungGeunMo.woff2') format('woff');
+  font-family: "RoundedFixedsys";
+  src: url("/fonts/DungGeunMo.woff2") format("woff");
   font-weight: normal;
   font-display: swap;
 }
 
 /* Tailwind v4 테마 설정 */
 @theme {
-  --font-gabia: 'GabiaGosran', sans-serif;
-  --font-roundfix: 'RoundedFixedsys', sans-serif;
-  --font-sans: 'SUIT', system-ui, sans-serif;
+  --font-gabia: "GabiaGosran", sans-serif;
+  --font-roundfix: "RoundedFixedsys", sans-serif;
+  --font-sans: "SUIT", system-ui, sans-serif;
   /* tailwindcss 유틸리티로 노출됨. (bg-*, text-*, border-*) */
-  --color-primary: #FEF1E8; /* peach surface */
-  --color-secondary: #F6E6DA; /* beige surface */
-  --color-brand: #523E1B; /* brand brown */
+  --color-primary: #fef1e8; /* peach surface */
+  --color-secondary: #f6e6da; /* beige surface */
+  --color-brand: #523e1b; /* brand brown */
 }
 
 /* 전역 스타일은 별도 레이어로 */
@@ -38,11 +38,11 @@
   :root {
     line-height: 1.5;
     color-scheme: light dark;
-    
-    --color-text: #3A290D;
+
+    --color-text: #3a290d;
     --color-bg: #ffffff;
-    --primary-color: #FEF1E8;
-    
+    --primary-color: #fef1e8;
+
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
