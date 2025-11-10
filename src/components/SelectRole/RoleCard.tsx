@@ -6,8 +6,8 @@ interface roleProps {
 
 const RoleCard: React.FC<roleProps> = ({ role }) => {
   return (
-    <div>
-      <p>{role}</p>
+    <div className="flex h-7.75 text-center bg-[#FFFDFB] rounded-lg">
+      <p className="text-[#3A290D] text-[1rem] font-gabia ">{role}</p>
     </div>
   );
 };
