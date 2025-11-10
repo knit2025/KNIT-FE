@@ -17,7 +17,7 @@ const FamilyCode: React.FC = () => {
         </p>
       </div>
       <div className="flex w-81 justify-end mr-7">
-        <div className="flex justify-center items-center rounded-[50%] w-6 h-5.75 bg-[#F8ECE3] text-[#846F5E] text-[1.25rem] font-roundfix mt-4">
+        <div className="flex justify-center items-center rounded-[50%] w-6 h-5.75 bg-[#F8ECE3] text-[#846F5E] text-[1.25rem] font-roundfix mt-4 cursor-pointer">
           <p>x</p>
         </div>
       </div>
