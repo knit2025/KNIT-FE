@@ -7,7 +7,9 @@ const SelectRole: React.FC = () => {
   return;
   <div className="w-[390px] h-screen flex flex-col items-center bg-linear-to-b from-[#ECD6C7] to-white">
     <div>
-      <p>당신은 가족 안에서 어떤 역할을 하고 있나요?</p>
+      <p className="text-[#3A290D] text-[0.875rem] font-gabia">
+        당신은 가족 안에서 어떤 역할을 하고 있나요?
+      </p>
       <div>
         <RoleCard role="엄마" />
         <RoleCard role="아빠" />
@@ -20,6 +22,9 @@ const SelectRole: React.FC = () => {
         <RoleCard role="기타" />
       </div>
     </div>
+    <InputField />
+    <InputField />
+    <StartBtn />
   </div>;
 };
 
