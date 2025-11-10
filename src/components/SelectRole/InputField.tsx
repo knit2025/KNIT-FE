@@ -1,7 +1,17 @@
 import React from "react";
 
-const InputField: React.FC = () => {
-  return <div></div>;
+interface labelProps {
+  label: string;
+  placeholder: string;
+}
+
+const InputField: React.FC<labelProps> = ({ label, placeholder }) => {
+  return (
+    <div>
+      <p>{label}</p>
+      <input placeholder={placeholder}></input>
+    </div>
+  );
 };
 
 export default InputField;
