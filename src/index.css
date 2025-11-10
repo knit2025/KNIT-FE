@@ -15,9 +15,17 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'RoundedFixedsys';
+  src: url('/fonts/DungGeunMo.woff2') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
 /* Tailwind v4 테마 설정 */
 @theme {
   --font-gabia: 'GabiaGosran', sans-serif;
+  --font-roundfix: 'RoundedFixedsys', sans-serif;
   --font-sans: 'SUIT', system-ui, sans-serif;
   /* tailwindcss 유틸리티로 노출됨. (bg-*, text-*, border-*) */
   --color-primary: #FEF1E8; /* peach surface */

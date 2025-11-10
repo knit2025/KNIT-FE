@@ -76,7 +76,7 @@ export const TodayMissionPage = () => {
         onClick={handleComplete}
         disabled={!photo || !comment.trim()}
         className={`
-          absolute top-[551px] left-[53px] w-[285px] h-[41px] rounded-[17px]
+          absolute top-[551px] left-[53px] w-[285px] h-[41px] rounded-[17px] font-roundfix
           flex items-center justify-center
           ${photo && comment.trim() ? 'bg-[#523E1B] cursor-pointer' : 'bg-[#523E1B]/30 cursor-not-allowed'}
         `}
