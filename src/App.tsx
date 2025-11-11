@@ -14,6 +14,7 @@ import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import FamilyCode from "./pages/FamilyCode/FamilyCode";
 import SelectRole from "./pages/SelectRole/SelectRole";
+import Home from "./pages/Home/Home";
 
 // ── [feature 브랜치] 질문 관련 페이지
 import { QuestionListPage } from "./pages/QuestionListPage";
@@ -74,6 +75,7 @@ function App() {
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/FamilyCode" element={<FamilyCode />} />
         <Route path="/SelectRole" element={<SelectRole />} />
+        <Route path="/Home" element={<Home />} />
 
         {/* 질문 관련(feature) */}
         <Route path={PATHS.questionList} element={<QuestionListPage />} />
