@@ -9,6 +9,12 @@ import {
 } from "react-router-dom";
 // import './App.css';
 
+// ── 로그인 및 회원가입 페이지
+import Login from "./pages/Login/Login";
+import SignUp from "./pages/SignUp/SignUp";
+import FamilyCode from "./pages/FamilyCode/FamilyCode";
+import SelectRole from "./pages/SelectRole/SelectRole";
+
 // ── [feature 브랜치] 질문 관련 페이지
 import { QuestionListPage } from "./pages/QuestionListPage";
 import { QuestionDetailPage } from "./pages/QuestionDetailPage";
@@ -24,10 +30,6 @@ import AnswerDetail from "./pages/AnswerDetail/AnswerDetail";
 import AddPhoto from "./pages/AddPhoto/AddPhoto";
 import { MissionPage } from "./pages/MissionPage";
 import { TodayMissionPage } from "./pages/TodayMissionPage";
-import Login from "./pages/Login/Login";
-import SignUp from "./pages/SignUp/SignUp";
-import FamilyCode from "./pages/FamilyCode/FamilyCode";
-import SelectRole from "./pages/SelectRole/SelectRole";
 
 // 질문 상세 진입 시 location.state를 기대하는 기존 래퍼 (feature 코드 유지)
 function QuestionDetailWrapper() {
@@ -64,11 +66,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 기본 진입은 질문 리스트로 리다이렉트 */}
-        <Route
-          path="/"
-          element={<Navigate to={PATHS.questionList} replace />}
-        />
+        {/* 기본 진입은 로그인 화면으로 리다이렉트*/}
+        <Route path="/" element={<Navigate to="/Login" replace />} />
+
+        {/* 로그인 & 회원가입 */}
+        <Route path="/Login" element={<Login />} />
+        <Route path="/SignUp" element={<SignUp />} />
+        <Route path="/FamilyCode" element={<FamilyCode />} />
+        <Route path="/SelectRole" element={<SelectRole />} />
 
         {/* 질문 관련(feature) */}
         <Route path={PATHS.questionList} element={<QuestionListPage />} />
@@ -84,16 +89,9 @@ function App() {
         <Route path="/PhotoDetail" element={<PhotoDetail />} />
         <Route path="/AnswerDetail" element={<AnswerDetail />} />
         <Route path="/AddPhoto" element={<AddPhoto />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/SignUp" element={<SignUp />} />
-        <Route path="/FamilyCode" element={<FamilyCode />} />
-        <Route path="/SelectRole" element={<SelectRole />} />
 
-        {/* 404 → 기본 라우트로 */}
-        <Route
-          path="*"
-          element={<Navigate to={PATHS.questionList} replace />}
-        />
+        {/* 404 → 기본 로그인 화면으로 */}
+        <Route path="*" element={<Navigate to="/Login" replace />} />
       </Routes>
     </Router>
   );
