@@ -63,11 +63,16 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 기본 진입은 질문 리스트로 리다이렉트 */}
+        {/* 기본 진입은 로그인 화면으로 리다이렉트*/}
         <Route
           path="/"
-          element={<Navigate to={PATHS.questionList} replace />}
+          element={<Navigate to="/Login" replace />}
         />
+
+        {/* 로그인 & 회원가입 */}
+        <Route path="/Login" element={<Login />} />
+        <Route path="/SignUp" element={<SignUp />} />
+        <Route path="/FamilyCode" element={<FamilyCode />} />
 
         {/* 질문 관련(feature) */}
         <Route path={PATHS.questionList} element={<QuestionListPage />} />
@@ -83,14 +88,11 @@ function App() {
         <Route path="/PhotoDetail" element={<PhotoDetail />} />
         <Route path="/AnswerDetail" element={<AnswerDetail />} />
         <Route path="/AddPhoto" element={<AddPhoto />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/SignUp" element={<SignUp />} />
-        <Route path="/FamilyCode" element={<FamilyCode />} />
 
-        {/* 404 → 기본 라우트로 */}
+        {/* 404 → 기본 로그인 화면으로 */}
         <Route
           path="*"
-          element={<Navigate to={PATHS.questionList} replace />}
+          element={<Navigate to="/Login" replace />}
         />
       </Routes>
     </Router>
