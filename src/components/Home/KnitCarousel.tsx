@@ -3,10 +3,24 @@ import React from "react";
 type Props = { images: string[] };
 
 const KnitCarousel: React.FC<Props> = ({ images }) => {
-  const visible = images.slice(0, 4);
+  const len = images.length;
+  const [start, setStart] = React.useState(0);
+  const visibleCount = 4;
+
+  const visible = Array.from({ length: visibleCount }, (_, i) => {
+    const idx = (start + i) % len;
+    return images[idx];
+  });
+
+  const handleClick = () => {
+    setStart((prev) => (prev + 1) % len);
+  };
 
   return (
-    <div className="w-[262px] overflow-hidden mx-auto mt-3 mb-6">
+    <div
+      className="w-[262px] overflow-hidden mx-auto mt-3 mb-6"
+      onClick={handleClick}
+    >
       <div className="flex gap-2.5">
         {visible.map((src, i) => (
           <div
