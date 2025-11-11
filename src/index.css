@@ -22,11 +22,19 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Freckle Face";
+  src: url("/fonts/FreckleFace-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
 /* Tailwind v4 테마 설정 */
 @theme {
   --font-gabia: "GabiaGosran", sans-serif;
   --font-roundfix: "RoundedFixedsys", sans-serif;
   --font-sans: "SUIT", system-ui, sans-serif;
+  --font-freckle: "Freckle Face", system-ui, sans-serif;
   /* tailwindcss 유틸리티로 노출됨. (bg-*, text-*, border-*) */
   --color-primary: #fef1e8; /* peach surface */
   --color-secondary: #f6e6da; /* beige surface */
