@@ -18,11 +18,11 @@ const KindnessBox: React.FC<BoxProps> = ({ family, content, onSave }) => {
     }
   };
   return (
-    <div className="flex w-85.5 h-30.5 rounded-[1.5625rem] bg-[#FEF1E8] flex-col text-left p-6 mb-5 gap-2">
-      <p
-        className="text-[#3A290D] font-sans text-[0.8125rem] font-bold"
-        onClick={() => setEditing(true)}
-      >
+    <div
+      className="flex w-85.5 h-30.5 rounded-[1.5625rem] bg-[#FEF1E8] flex-col text-left p-6 mb-5 gap-2 cursor-pointer"
+      onClick={() => setEditing(true)}
+    >
+      <p className="text-[#3A290D] font-sans text-[0.8125rem] font-bold">
         {family}
       </p>
       {editing ? (
@@ -31,14 +31,14 @@ const KindnessBox: React.FC<BoxProps> = ({ family, content, onSave }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="오늘의 친절"
-          className="outline-none text-[0.75rem]"
+          placeholder="서두르지 않아도 괜찮아요. 천천히, 오늘의 마음을 써볼까요?"
+          className="outline-none placeholder: text-[#A0988A] placeholder: text-[0.6875rem] placeholder: font-sans"
         />
       ) : content ? (
         <p className="text-[#000000] font-sans text-[0.6875rem]">{content}</p>
       ) : (
-        <p className="text-[#CBCBCB] font-sans text-[0.6875rem]">
-          오늘의 친절을 입력해 주세요.
+        <p className="text-[#A0988A] font-sans text-[0.6875rem]">
+          서두르지 않아도 괜찮아요. 천천히, 오늘의 마음을 써볼까요?
         </p>
       )}
     </div>
