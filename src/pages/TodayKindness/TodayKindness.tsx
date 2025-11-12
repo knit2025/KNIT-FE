@@ -4,7 +4,7 @@ import KindnessBox from "../../components/TodayKindness/KindnessBox";
 import { useState } from "react";
 
 const TodayKindness: React.FC = () => {
-  const familyList = ["아빠", "엄마", "형", "동생", "할머니", "할아버지"];
+  const familyList = ["아빠", "엄마", "형", "동생"];
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
@@ -13,7 +13,7 @@ const TodayKindness: React.FC = () => {
   };
 
   return (
-    <div className="w-[390px] h-screen flex flex-col items-center bg-white">
+    <div className="w-[390px] h-screen overflow-hidden flex flex-col items-center bg-white">
       <p className="font-gabia text-[#3A290D] text-[1.5rem] pt-20 pb-10">
         {" "}
         " 오늘 내가 가족에게 <br /> 베푼 작은 친절은? "{" "}
