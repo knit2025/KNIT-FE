@@ -16,6 +16,7 @@ import FamilyCode from "./pages/FamilyCode/FamilyCode";
 import SelectRole from "./pages/SelectRole/SelectRole";
 import Knitting from "./pages/Knitting/Knitting";
 import Kindness from "./pages/TodayKindness/TodayKindness";
+import Home from "./pages/Home/Home";
 
 // ── [feature 브랜치] 질문 관련 페이지
 import { QuestionListPage } from "./pages/QuestionListPage";
@@ -78,6 +79,7 @@ function App() {
         <Route path="/SelectRole" element={<SelectRole />} />
         <Route path="/Knitting" element={<Knitting />} />
         <Route path="/Kindness" element={<Kindness />} />
+        <Route path="/Home" element={<Home />} />
 
         {/* 질문 관련(feature) */}
         <Route path={PATHS.questionList} element={<QuestionListPage />} />
