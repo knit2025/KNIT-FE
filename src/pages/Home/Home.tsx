@@ -10,11 +10,11 @@ const Home: React.FC = () => {
   return (
     <>
       <div className="w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFFFFF] to-[#DBBBA4]">
-        <div className="flex flex-col items-start pt-20 w-full">
+        <div className="flex flex-col items-start w-full">
           <Header
             className="text-left pl-8 w-full"
             textSize="text-[40px]"
-            topLoc="top-[-70px]"
+            topLoc="top-[-30px]"
             leftLoc="left-0"
           />
           <ProgressBar item="니트" />
