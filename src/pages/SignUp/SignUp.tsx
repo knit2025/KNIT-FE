@@ -2,10 +2,12 @@ import SignupInput from "../../components/SignUp/SignupInput";
 import SignupBtn from "../../components/SignUp/SignupBtn";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const API = "https://junhong.shop";
 
 const SignUp: React.FC = () => {
+  const navigate = useNavigate();
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -33,6 +35,9 @@ const SignUp: React.FC = () => {
     const res = await axios.post(`${API}/accounts/code`);
     console.log("가족코드:", res.data);
     setFamilyCode(res.data.familyCode);
+
+    setFamilyCode(res.data.familyCode);
+    navigate("/familyCode", { state: { familyCode: res.data.familyCode } });
   };
 
   const handleSignUp = async () => {
