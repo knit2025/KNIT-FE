@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState } from "react";
+import type { TouchEvent } from "react";
 
 interface UseSwipeProps {
   onSwipeUp?: () => void;
@@ -9,16 +10,16 @@ interface UseSwipeProps {
 export const useSwipe = ({
   onSwipeUp,
   onSwipeDown,
-  threshold = 50
+  threshold = 50,
 }: UseSwipeProps) => {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = (e: TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientY);
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = (e: TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientY);
   };
 

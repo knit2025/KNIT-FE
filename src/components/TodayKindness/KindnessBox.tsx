@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { KeyboardEvent } from "react";
 
 type BoxProps = {
   family: string;
@@ -10,7 +11,7 @@ const KindnessBox: React.FC<BoxProps> = ({ family, content, onSave }) => {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(content);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       onSave(family, text);
       setEditing(false);

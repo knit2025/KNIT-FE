@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState } from "react";
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
+import type { ChangeEvent } from "react";
 
 export const TodayMissionPage = () => {
   const [photo, setPhoto] = useState<File | null>(null);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setPhoto(file);
@@ -16,7 +17,7 @@ export const TodayMissionPage = () => {
   const handleComplete = () => {
     if (photo && comment.trim()) {
       // 미션 완료 처리
-      console.log('Mission completed', { photo, comment });
+      console.log("Mission completed", { photo, comment });
     }
   };
 
@@ -61,7 +62,9 @@ export const TodayMissionPage = () => {
           <h2 className="text-[17px] font-semibold text-[#3A290D] mb-[11px]">
             미션 후 소감
           </h2>
-          <p className="text-[11px] font-gabia text-[#3A290D] mb-[8px]">답변 내용</p>
+          <p className="text-[11px] font-gabia text-[#3A290D] mb-[8px]">
+            답변 내용
+          </p>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
@@ -78,7 +81,11 @@ export const TodayMissionPage = () => {
         className={`
           absolute top-[551px] left-[53px] w-[285px] h-[41px] rounded-[17px] font-roundfix
           flex items-center justify-center
-          ${photo && comment.trim() ? 'bg-[#523E1B] cursor-pointer' : 'bg-[#523E1B]/30 cursor-not-allowed'}
+          ${
+            photo && comment.trim()
+              ? "bg-[#523E1B] cursor-pointer"
+              : "bg-[#523E1B]/30 cursor-not-allowed"
+          }
         `}
       >
         <span className="text-[18px] font-dunggeunmo text-white">
