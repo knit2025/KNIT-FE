@@ -1,5 +1,3 @@
-import React from "react";
-
 import sheep1 from "../../assets/sheep1.png";
 import sheep2 from "../../assets/sheep2.png";
 import sheep3 from "../../assets/sheep3.png";

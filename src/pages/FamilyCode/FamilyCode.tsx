@@ -1,5 +1,3 @@
-import React from "react";
-
 const FamilyCode: React.FC = () => {
   return (
     <div className="w-[390px] h-screen flex flex-col justify-center items-center bg-[#D7BCA8]">
