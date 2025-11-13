@@ -17,7 +17,7 @@ const Home: React.FC = () => {
             topLoc="top-[-30px]"
             leftLoc="left-0"
           />
-          <ProgressBar item="니트" />
+          <ProgressBar item="니트" currentPoint={10} maxPoint={10} />
         </div>
         <div className="flex flex-col items-center">
           <div className="flex flex-col">
