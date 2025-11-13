@@ -1,21 +1,24 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { QuestionTarget, CreateQuestionForm, Question } from '../types/question';
-import Header from '../components/Header/Header';
-import SectionCard from '../components/Question/SectionCard';
-import OptionGroup, { YesNoGroup } from '../components/Question/OptionGroup';
-import TextAreaField from '../components/Question/TextAreaField';
-import PrimaryButton from '../components/Question/PrimaryButton';
-import Footer from '../components/Footer/Footer';
-import { PATHS } from '../routes';
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type {
+  QuestionTarget,
+  CreateQuestionForm,
+  Question,
+} from "../types/question";
+import Header from "../components/Header/Header";
+import SectionCard from "../components/Question/SectionCard";
+import OptionGroup, { YesNoGroup } from "../components/Question/OptionGroup";
+import TextAreaField from "../components/Question/TextAreaField";
+import PrimaryButton from "../components/Question/PrimaryButton";
+import Footer from "../components/Footer/Footer";
+import { PATHS } from "../routes";
 
 const targetOptions: { label: string; value: QuestionTarget }[] = [
-  { label: '아빠', value: '아빠에게' },
-  { label: '엄마', value: '엄마에게' },
-  { label: '아들', value: '아들에게' },
-  { label: '모두에게', value: '모두에게' },
+  { label: "아빠", value: "아빠에게" },
+  { label: "엄마", value: "엄마에게" },
+  { label: "아들", value: "아들에게" },
+  { label: "모두에게", value: "모두에게" },
 ];
-
 
 export const CreateQuestionPage = () => {
   const navigate = useNavigate();
@@ -42,9 +45,9 @@ export const CreateQuestionPage = () => {
 
     const newQuestion: Question = {
       id: String(Date.now()),
-      authorRole: '기타',
+      authorRole: "기타",
       targetRole: formData.targetRole,
-      title: '',
+      title: "",
       content: formData.content.trim(),
       revealAuthor: !!formData.revealAuthor,
       publicToAll: !!formData.publicToAll,
@@ -71,11 +74,14 @@ export const CreateQuestionPage = () => {
 
       {/* 섹션: 누구에게 질문 - 79px 높이 */}
       <div className="absolute top-[190px] left-[25px] w-[340px] h-[79px]">
-        <SectionCard title="누구에게 질문하고 싶으신가요?" className="rounded-[14px] h-full">
+        <SectionCard
+          title="누구에게 질문하고 싶으신가요?"
+          className="rounded-[14px] h-full"
+        >
           <OptionGroup
             options={targetOptions}
             value={formData.targetRole}
-            onChange={handleTargetSelect}
+            onChange={(v) => handleTargetSelect(v as QuestionTarget)}
           />
         </SectionCard>
       </div>
@@ -83,23 +89,36 @@ export const CreateQuestionPage = () => {
       {/* 섹션: 나를 드러낼까요 - 79px 높이 */}
       <div className="absolute top-[284px] left-[25px] w-[340px] h-[79px]">
         <SectionCard title="나를 드러낼까요?" className="rounded-[14px] h-full">
-          <YesNoGroup value={formData.revealAuthor} onChange={handleRevealAuthor} />
+          <YesNoGroup
+            value={formData.revealAuthor}
+            onChange={handleRevealAuthor}
+          />
         </SectionCard>
       </div>
 
       {/* 섹션: 모두에게 공개 - 79px 높이 */}
       <div className="absolute top-[378px] left-[25px] w-[340px] h-[79px]">
-        <SectionCard title="질문을 모두에게 공개할까요?" className="rounded-[14px] h-full">
-          <YesNoGroup value={formData.publicToAll} onChange={handlePublicToAll} />
+        <SectionCard
+          title="질문을 모두에게 공개할까요?"
+          className="rounded-[14px] h-full"
+        >
+          <YesNoGroup
+            value={formData.publicToAll}
+            onChange={handlePublicToAll}
+          />
         </SectionCard>
       </div>
 
       {/* 섹션: 질문 내용 - 188px 높이 */}
       <div className="absolute top-[476px] left-[25px] w-[340px] h-[188px]">
-        <SectionCard title="편하게 물어보아요" variant="peach" className="rounded-[14px] h-full">
+        <SectionCard
+          title="편하게 물어보아요"
+          variant="peach"
+          className="rounded-[14px] h-full"
+        >
           <TextAreaField
             label="질문 내용"
-            value={formData.content || ''}
+            value={formData.content || ""}
             onChange={handleContentChange}
             className="bg-transparent"
           />
