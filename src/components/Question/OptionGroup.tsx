@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, PropsWithChildren } from 'react';
+import type { ButtonHTMLAttributes, PropsWithChildren } from "react";
 
 // Simpler, non-generic option item
 export type OptionItem = {
@@ -10,13 +10,18 @@ type SelectableButtonProps = PropsWithChildren<
   { selected?: boolean } & ButtonHTMLAttributes<HTMLButtonElement>
 >;
 
-function SelectableButton({ selected = false, className = '', children, ...rest }: SelectableButtonProps) {
+function SelectableButton({
+  selected = false,
+  className = "",
+  children,
+  ...rest
+}: SelectableButtonProps) {
   return (
     <button
       {...rest}
       className={`
         min-w-[59px] h-[24px] px-3 rounded-md text-[10px] font-semibold transition-all
-        ${selected ? 'bg-[#523E1B] text-white' : 'bg-[#FFFCF9] text-[#3A290D]'}
+        ${selected ? "bg-[#523E1B] text-white" : "bg-[#FFFCF9] text-[#3A290D]"}
         ${className}
       `}
     >
@@ -27,12 +32,17 @@ function SelectableButton({ selected = false, className = '', children, ...rest 
 
 type OptionGroupProps = {
   options: ReadonlyArray<OptionItem>;
-  value?: OptionItem['value'];
-  onChange: (v: OptionItem['value']) => void;
+  value?: OptionItem["value"];
+  onChange: (v: OptionItem["value"]) => void;
   className?: string;
 };
 
-function OptionGroup({ options, value, onChange, className = '' }: OptionGroupProps) {
+function OptionGroup({
+  options,
+  value,
+  onChange,
+  className = "",
+}: OptionGroupProps) {
   return (
     <div className={`flex items-center justify-start gap-[18px] ${className}`}>
       {options.map((option) => (
@@ -58,8 +68,14 @@ type YesNoGroupProps = {
 
 export function YesNoGroup({ value, onChange }: YesNoGroupProps) {
   const yesNoOptions: OptionItem[] = [
-    { label: '네', value: true },
-    { label: '아니오', value: false },
+    { label: "네", value: true },
+    { label: "아니오", value: false },
   ];
-  return <OptionGroup options={yesNoOptions} value={value} onChange={onChange} />;
+  return (
+    <OptionGroup
+      options={yesNoOptions}
+      value={value}
+      onChange={(v) => onChange(v as boolean)}
+    />
+  );
 }

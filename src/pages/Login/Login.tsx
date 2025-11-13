@@ -1,4 +1,3 @@
-import React from "react";
 import InputField from "../../components/Login/InputField";
 import Button from "../../components/Login/Button";
 import sheepImg from "../../assets/LoginSheep.png";

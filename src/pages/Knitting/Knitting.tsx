@@ -1,4 +1,3 @@
-import React from "react";
 import knitting1 from "../../assets/knitting1.png";
 import knitting2 from "../../assets/knitting2.png";
 import knitting3 from "../../assets/knitting3.png";

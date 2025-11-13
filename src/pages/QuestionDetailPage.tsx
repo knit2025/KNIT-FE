@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import type { Question } from '../types/question';
-import Header from '../components/Header/Header';
-import { QuestionCard } from '../components/QuestionCard/QuestionCard';
-import PrimaryButton from '../components/Question/PrimaryButton';
-import Footer from '../components/Footer/Footer';
+import { useState } from "react";
+import type { Question } from "../types/question";
+import Header from "../components/Header/Header";
+import { QuestionCard } from "../components/QuestionCard/QuestionCard";
+import PrimaryButton from "../components/Question/PrimaryButton";
+import Footer from "../components/Footer/Footer";
 
 interface QuestionDetailPageProps {
   question: Question;
@@ -14,9 +14,8 @@ interface QuestionDetailPageProps {
 export const QuestionDetailPage = ({
   question,
   onSubmit,
-  onBack
 }: QuestionDetailPageProps) => {
-  const [answer, setAnswer] = useState('');
+  const [answer, setAnswer] = useState("");
 
   const handleSubmit = () => {
     if (answer.trim()) {
@@ -26,7 +25,7 @@ export const QuestionDetailPage = ({
 
   return (
     <div className="relative w-[390px] min-h-screen mx-auto text-left bg-white">
-      <Header/>
+      <Header />
 
       {/* 제목 */}
       <h1 className="absolute top-[136px] left-[26px] text-[20px] font-semibold text-[#3A290D]">

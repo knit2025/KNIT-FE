@@ -1,7 +1,7 @@
-import React from "react";
 import leftBtn from "../../assets/leftBtn.png";
 import rightBtn from "../../assets/rightBtn.png";
 import Item from "../../components/Home/Item";
+import { useState } from "react";
 
 type ItemData = {
   id: number;
@@ -16,7 +16,7 @@ type CarouselProps = {
 };
 
 const ItemCarousel: React.FC<CarouselProps> = ({ items, currentItemIndex }) => {
-  const [startIndex, setStartIndex] = React.useState(0);
+  const [startIndex, setStartIndex] = useState(0);
   const lastStartIndex = items.length - 4;
   const canGoLeft = startIndex > 0;
 

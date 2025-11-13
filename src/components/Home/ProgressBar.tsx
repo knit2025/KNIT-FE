@@ -1,5 +1,3 @@
-import React from "react";
-
 type progressProps = {
   item: string;
   currentPoint: number;
