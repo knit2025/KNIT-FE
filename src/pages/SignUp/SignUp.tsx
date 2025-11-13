@@ -12,12 +12,21 @@ const SignUp: React.FC = () => {
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
   const [familyCode, setFamilyCode] = useState<string | null>(null);
+  const [idMessage, setIdMessage] = useState<string | null>(null);
 
   const handleCheckId = async () => {
-    const res = await axios.get(`${API}/accounts/checkId`, {
-      params: { loginId },
-    });
-    console.log("중복확인:", res.data);
+    try {
+      const res = await axios.get(`${API}/accounts/checkId`, {
+        params: { loginId },
+      });
+      if (res.data.message === "ok ") {
+        setIdMessage("사용 가능한 아이디입니다.");
+      } else if (res.data.message === "id is taken") {
+        setIdMessage("이미 사용 중인 아이디입니다.");
+      }
+    } catch {
+      setIdMessage("오류 발생");
+    }
   };
 
   const handleCreateFamilyCode = async () => {
@@ -62,6 +71,11 @@ const SignUp: React.FC = () => {
               중복 확인
             </button>
           </div>
+          {idMessage && (
+            <div className="mt-2 text-[0.75rem] text-[#FF0000]">
+              {idMessage}
+            </div>
+          )}
         </div>
         <SignupInput
           fieldName="비밀번호"
