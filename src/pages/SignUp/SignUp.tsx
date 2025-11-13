@@ -40,15 +40,10 @@ const SignUp: React.FC = () => {
     navigate("/familyCode", { state: { familyCode: res.data.familyCode } });
   };
 
-  const handleSignUp = async () => {
-    await axios.post(`${API}/accounts/signup`, {
-      loginId,
-      password,
-      name,
-      birth,
-      familyCode,
+  const goToSelectRole = () => {
+    navigate("/selectRole", {
+      state: { loginId, password, name, birth, familyCode },
     });
-    console.log("회원가입 완료!");
   };
 
   return (
@@ -121,7 +116,7 @@ const SignUp: React.FC = () => {
             가족 코드 생성
           </button>
         </div>
-        <SignupBtn buttonName="회원가입" onClick={handleSignUp} />
+        <SignupBtn buttonName="다음" onClick={goToSelectRole} />
       </div>
     </div>
   );
