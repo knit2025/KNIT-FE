@@ -1,10 +1,18 @@
 interface labelProps {
   label: string;
   placeholder: string;
-  bgColor?: string;
+  bgColor: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
 }
 
-const InputField: React.FC<labelProps> = ({ label, placeholder, bgColor }) => {
+const InputField: React.FC<labelProps> = ({
+  label,
+  placeholder,
+  bgColor,
+  value,
+  onChange,
+}) => {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-[#3A290D] text-[0.875rem] font-gabia">{label}</p>
@@ -13,6 +21,8 @@ const InputField: React.FC<labelProps> = ({ label, placeholder, bgColor }) => {
           bgColor ?? "bg-white"
         }`}
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
       ></input>
     </div>
   );
