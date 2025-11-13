@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className='absolute bottom-0 m-0 w-[390px] h-[86px] bg-[#FFF7F3] flex justify-center items-center text-center z-100'>
+    <div className='fixed bottom-0 m-0 w-[390px] h-[86px] bg-[#FFF7F3] flex justify-center items-center text-center z-100'>
       <div className='flex justify-center items-center gap-10'>
         <div>
           <img src={fad} className='w-[29px] h-[29px] object-contain cursor-pointer'/>

@@ -42,8 +42,8 @@ export const useSwipe = ({
   };
 
   return {
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
+    onTouchStart: handleTouchStart,
+    onTouchMove: handleTouchMove,
+    onTouchEnd: handleTouchEnd,
   };
 };
