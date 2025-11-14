@@ -118,7 +118,7 @@ const MisstonClick = (missionInstanceId: number) => {
 
 
   return (
-    <div className="pb-[85px] h-[844px] relative mx-auto w-[390px] bg-white">
+    <div className="pb-[85px] h-[844px] min-h-sc relative mx-auto w-[390px] bg-white">
       <div className="sticky top-0 bg-white">
       <img
         src={KNITLG}
@@ -173,6 +173,7 @@ const MisstonClick = (missionInstanceId: number) => {
 </div>
       {/* 게시물 */}
       {/* 게시물 그리드 */}
+      {/* footer Fixed, 부모 div min-h-screen  */}
       <div className="pr-[23px] pl-[23px] mt-[5px] h-[577px] pb-[17px] overflow-auto">
         <div
           className="grid gap-4 auto-rows-auto"
@@ -273,7 +274,7 @@ const MisstonClick = (missionInstanceId: number) => {
         <img src={PlusIcon} alt="PlusIcon" className="w-[36px] h-[36px]" />
       </button>
       {/* </div> */}
-      <div className="bottom-0 left-0 w-full z-40">
+      <div className="bottom-0 left-0 w-full z-40 absolute">
         <Footer></Footer>
       </div>
     </div>
