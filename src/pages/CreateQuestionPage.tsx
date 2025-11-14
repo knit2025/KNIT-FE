@@ -12,10 +12,10 @@ import { createQuestion } from '../api/questions';
 
 
 const targetOptions: { label: string; value: QuestionTarget }[] = [
-  { label: '아빠', value: '아빠에게' },
-  { label: '엄마', value: '엄마에게' },
-  { label: '아들', value: '아들에게' },
-  { label: '모두에게', value: '모두에게' },
+  { label: "아빠", value: "아빠에게" },
+  { label: "엄마", value: "엄마에게" },
+  { label: "아들", value: "아들에게" },
+  { label: "모두에게", value: "모두에게" },
 ];
 
 // QuestionTarget을 백엔드 role 문자열로 변환하는 헬퍼 함수
