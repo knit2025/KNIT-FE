@@ -99,7 +99,7 @@ const MisstonClick = (missionInstanceId: number) => {
 
 
   return (
-    <div className="overflow-y-auto pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
+    <div className="pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -108,6 +108,7 @@ const MisstonClick = (missionInstanceId: number) => {
       <div className="pl-[23px] text-left ml-2 mt-5 mb-[36px] text-[18px] font-semibold text-[#3A290D]">
         우리가족의 소중한 추억
       </div>
+      <div className="flex-1 overflow-y-auto">
       <div className="mr-[23px] flex gap-4 justify-end mb-3">
         <div className="flex gap-1 cursor-pointer">
           <img src={DotIcon} alt="DotIcon" className="" />
@@ -137,7 +138,7 @@ const MisstonClick = (missionInstanceId: number) => {
           style={{
             // 게시물 고정
             gridTemplateColumns: "repeat(3, 104px)",
-            gridAutoFlow: "row dense", // 빈 공간 채우기
+            gridAutoFlow: "row dense", 
           }}
         >
           {data?.posts.map((p) => (
@@ -279,7 +280,7 @@ const MisstonClick = (missionInstanceId: number) => {
           ))}
         </div>
       </div> */}
-
+</div>
       <button
         type="button"
         className="absolute right-[23px] bottom-[calc(100px+16px)] cursor-pointer z-50"
