@@ -15,15 +15,52 @@ type TodayQuestion = {
   totalMembers: number;
 };
 
-const TodayKindness: React.FC = () => {
-  const familyList = ["아빠", "엄마", "형", "동생"];
+type AnswerItem = {
+  userName: string;
+  content: string;
+};
 
+type AnswerList = {
+  answers: AnswerItem[];
+  answerCount: number;
+  totalMembers: number;
+  allAnswered: boolean;
+};
+
+const TodayKindness: React.FC = () => {
+  const [familyList, setFamilyList] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [question, setQuestion] = useState<string>("");
   const [instanceId, setInstanceId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // const [questionInfo, setQuestionInfo] = useState<TodayQuestion | null>(null);
+
+  const fetchAnswerList = async (instanceId: number) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get<AnswerList>(
+        `${baseURL}/adminqa/${instanceId}/answers`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const serverAnswers = res.data.answers;
+
+      const names = serverAnswers.map((item) => item.userName);
+      setFamilyList(names);
+
+      const answerMap: Record<string, string> = {};
+      serverAnswers.forEach((item) => {
+        answerMap[item.userName] = item.content;
+      });
+
+      setAnswers(answerMap);
+    } catch (err) {
+      console.error("답변 목록 불러오기 실패:", err);
+    }
+  };
 
   const handleSave = async (name: string, text: string) => {
     setAnswers((prev) => ({ ...prev, [name]: text }));
@@ -77,6 +114,7 @@ const TodayKindness: React.FC = () => {
         const data = res.data;
         setQuestion(data.content);
         setInstanceId(data.instanceId);
+        await fetchAnswerList(data.instanceId);
         // setQuestionInfo(data);
       } catch (err) {
         console.error("오늘의 질문 불러오기 실패:", err);
