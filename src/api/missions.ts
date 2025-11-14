@@ -26,6 +26,22 @@ export interface MissionSubmitResponse {
   isCompleted: boolean;
 }
 
+export interface UserSubmission {
+  userId: number;
+  userName: string;
+  opinion: string;
+  image: string;
+  createdAt: string;
+}
+
+export interface MissionDetailResponse {
+  missionInstanceId: number;
+  title: string;
+  content: string;
+  completedDate: string;
+  userSubmissions: UserSubmission[];
+}
+
 /**
  * 오늘의 미션 조회
  *
@@ -46,10 +62,14 @@ export const getTodayMission = async (): Promise<TodayMissionResponse> => {
     });
 
     console.log('응답 상태:', response.status);
+    console.log('응답 헤더 Content-Type:', response.headers.get('content-type'));
 
     if (!response.ok) {
       if (response.status === 403) throw new Error('인증이 필요합니다');
       if (response.status === 404) throw new Error('미션을 찾을 수 없습니다');
+
+      const errorText = await response.text();
+      console.error('에러 응답 내용:', errorText);
       throw new Error(`미션을 불러오는데 실패했습니다 (${response.status})`);
     }
 
@@ -82,10 +102,21 @@ export const getCompletedMissions = async (): Promise<CompletedMission[]> => {
     });
 
     console.log('응답 상태:', response.status);
+    console.log('응답 헤더 Content-Type:', response.headers.get('content-type'));
 
     if (!response.ok) {
       if (response.status === 403) throw new Error('인증이 필요합니다');
+
+      const errorText = await response.text();
+      console.error('에러 응답 내용:', errorText);
       throw new Error(`미션 목록을 불러오는데 실패했습니다 (${response.status})`);
+    }
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('JSON이 아닌 응답:', text);
+      throw new Error('서버가 JSON 형식이 아닌 응답을 반환했습니다');
     }
 
     const data = await response.json();
@@ -93,6 +124,56 @@ export const getCompletedMissions = async (): Promise<CompletedMission[]> => {
     return data;
   } catch (error) {
     console.error('완료된 미션 조회 에러:', error);
+    throw error;
+  }
+};
+
+/**
+ * 미션 상세 조회
+ *
+ * @param {number} missionId - 미션 ID
+ * @returns {Promise<MissionDetailResponse>} 미션 상세 정보
+ * @throws {Error} 인증 실패, 미션 없음, 기타 에러
+ */
+export const getMissionDetail = async (missionId: number): Promise<MissionDetailResponse> => {
+  const url = `${API_BASE_URL}/missions?missionId=${missionId}`;
+  const headers = getAuthHeaders();
+
+  console.log('미션 상세 조회 API 요청:', url);
+  console.log('헤더:', headers);
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+    });
+
+    console.log('응답 상태:', response.status);
+    console.log('응답 헤더 Content-Type:', response.headers.get('content-type'));
+
+    if (!response.ok) {
+      if (response.status === 403) throw new Error('인증이 필요합니다');
+      if (response.status === 404) throw new Error('미션을 찾을 수 없습니다');
+
+      // 에러 응답 내용 확인
+      const errorText = await response.text();
+      console.error('에러 응답 내용:', errorText);
+      throw new Error(`미션을 불러오는데 실패했습니다 (${response.status})`);
+    }
+
+    // Content-Type 확인
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('JSON이 아닌 응답:', text);
+      throw new Error('서버가 JSON 형식이 아닌 응답을 반환했습니다');
+    }
+
+    const data = await response.json();
+    console.log('미션 상세 데이터:', data);
+    return data;
+  } catch (error) {
+    console.error('미션 상세 조회 에러:', error);
     throw error;
   }
 };
