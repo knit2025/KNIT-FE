@@ -35,6 +35,12 @@ const AddPhoto = () => {
   const handleSubmit = async (e: React.FormEvent) => { 
     e.preventDefault();
     setError('');
+
+    if (year.length !== 4 || !month || !day) {
+    setError('날짜를 올바르게 입력해주세요. (예: 2025년 3월 3일)');
+    return;
+  }
+
     setLoading(true);
 
 // 데이터 확인 (콘솔)
@@ -64,10 +70,9 @@ const AddPhoto = () => {
     }
   };
 
-
 // const AddPhoto = () => {
   return (
-    <div className="relative mx-auto w-[390px] bg-white min-h-screen">
+    <div className="overflow-y-auto pb-[100px] relative mx-auto w-[390px] bg-white min-h-screen">
       <img
         src={KNITLG}
         alt="KNITLG"

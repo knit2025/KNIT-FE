@@ -6,10 +6,11 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-// import './App.css';
+// 로그인 후 화면 이동
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // ── 컴포넌트
-import { ProtectedRoute } from "./components/ProtectedRoute";
+// import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // ── 로그인 및 회원가입 페이지
 import Login from "./pages/Login/Login";
@@ -74,14 +75,8 @@ function App() {
         {/* 기본 진입은 로그인 화면으로 리다이렉트 (비로그인 사용자용) */}
         <Route path="/" element={<Navigate to="/Login" replace />} />
 
-        {/* 로그인 & 회원가입 (비보호 라우트) */}
-        <Route path="/Login" element={<Login />} />
-        <Route path="/SignUp" element={<SignUp />} />
-        <Route path="/FamilyCode" element={<FamilyCode />} />
-        <Route path="/SelectRole" element={<SelectRole />} />
-        <Route path="/Knitting" element={<Knitting />} />
-        <Route path="/Kindness" element={<Kindness />} />
 
+        {/* 로그인 & 회원가입 - 인증 불필요 */}
         {/* 홈 (로그인 필요) */}
         <Route path="/Home" element={
           <ProtectedRoute>
