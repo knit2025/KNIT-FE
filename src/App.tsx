@@ -6,11 +6,9 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-// 로그인 후 화면 이동
-import ProtectedRoute from "./components/ProtectedRoute";
 
 // ── 컴포넌트
-// import { ProtectedRoute } from "./components/ProtectedRoute";
+import  ProtectedRoute  from "./components/ProtectedRoute";
 
 // ── 로그인 및 회원가입 페이지
 import Login from "./pages/Login/Login";

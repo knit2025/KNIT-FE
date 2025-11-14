@@ -1,4 +1,5 @@
 import { API_BASE_URL, getAuthHeaders } from './config';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface TodayMissionResponse {
   missionId: number;
