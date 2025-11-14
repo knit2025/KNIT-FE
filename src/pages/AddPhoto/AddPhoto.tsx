@@ -67,7 +67,7 @@ const AddPhoto = () => {
 
 // const AddPhoto = () => {
   return (
-    <div className="relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden min-h-screen">
+    <div className="relative mx-auto w-[390px] bg-white min-h-screen">
       <img
         src={KNITLG}
         alt="KNITLG"
