@@ -174,7 +174,7 @@ const MisstonClick = (missionInstanceId: number) => {
       {/* 게시물 */}
       {/* 게시물 그리드 */}
       {/* footer Fixed, 부모 div min-h-screen  */}
-      <div className="pr-[23px] pl-[23px] mt-[5px] h-[577px] pb-[17px] overflow-auto">
+      <div className="pr-[23px] pl-[23px] mt-[5px] h-[577px] pb-10 overflow-auto">
         <div
           className="grid gap-4 auto-rows-auto"
           style={{
@@ -268,13 +268,13 @@ const MisstonClick = (missionInstanceId: number) => {
 </div>
       <button
         type="button"
-        className="absolute right-[23px] bottom-[calc(100px+16px)] cursor-pointer z-50"
+        className="absolute right-[23px] bottom-[calc(100px+72px)] cursor-pointer z-50"
         onClick={handleClick}
       >
         <img src={PlusIcon} alt="PlusIcon" className="w-[36px] h-[36px]" />
       </button>
       {/* </div> */}
-      <div className="bottom-0 left-0 w-full z-40 absolute">
+      <div className="bottom-0 left-0 w-full z-40">
         <Footer></Footer>
       </div>
     </div>

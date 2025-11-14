@@ -34,10 +34,10 @@ useEffect(() => {
       if (!token) throw new Error("로그인이 필요합니다.");
 
       const instanceId = Number(customQId);
-      // const res = await axios.get(`${baseURL}/adminqa/${instanceId}/answers`, {
-        // headers: { Authorization: `Bearer ${token}` },
-        const res = await axios.get(`${baseURL}/adminqa/3/answers`, {
-        headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYzMTIzNTAxLCJpYXQiOjE3NjMxMTYzMDEsImp0aSI6ImFmYmI0MTZmMzU3NjRiZTliODUzMDQyZGI5MjY4NzE3IiwidXNlcl9pZCI6IjEyIn0.nCBZpJGs7yCtKWEMnFAH4DMmIiJ2XrE5MSS7zFA1DAQ` },
+      const res = await axios.get(`${baseURL}/adminqa/${instanceId}/answers`, {
+        headers: { Authorization: `Bearer ${token}` },
+        // const res = await axios.get(`${baseURL}/adminqa/3/answers`, {
+        // headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX1CJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYzMTIzNTAxLCJpYXQiOjE3NjMxMTYzMDEsImp0aSI6ImFmYmI0MTZmMzU3NjRiZTliODUzMDQyZGI5MjY4NzE3IiwidXNlcl9pZCI6IjEyIn0.nCBZpJGs7yCtKWEMnFAH4DMmIiJ2XrE5MSS7zFA1DAQ` },
       });
 
       //익명 처리
