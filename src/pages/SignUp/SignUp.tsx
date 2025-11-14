@@ -83,7 +83,7 @@ const SignUp: React.FC = () => {
       <h1 className="text-[#3A290D] font-sans text-[1.5rem] font-semibold pt-20 pb-10">
         회원가입
       </h1>
-      <div className="flex flex-col gap-4 mt-6 m-5">
+      <div className="pr-[23px] pl-[23px] mt-[5px] h-[577px] pb-10 overflow-auto flex flex-col gap-4 mt-6 m-5">
         <div className="flex flex-col text-left">
           <label className="font-sans text-[#3A290D] font-semibold text-[0.875rem] pb-4">
             아이디
