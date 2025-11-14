@@ -42,7 +42,7 @@ const Login: React.FC = () => {
 
       setLoginId("");
       setPassword("");
-      navigate("/home");
+      navigate("/Home");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
@@ -58,7 +58,7 @@ const Login: React.FC = () => {
   };
 
   const goToSignUp = () => {
-    navigate("/signup");
+    navigate("/SignUp");
   };
 
   return (

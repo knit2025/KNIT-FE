@@ -1,5 +1,5 @@
 // src/lib/api/post.ts
-import api from "./api";
+import api from "./axios";
 
 // 게시물 작성
 export const createPost = async (
