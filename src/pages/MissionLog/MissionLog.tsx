@@ -80,12 +80,31 @@ const MisstonClick = (missionInstanceId: number) => {
   //   navigate(`/MissionDetail/${missionId}`);
   // };
 
-  const loadData = async () => {
+  // const loadData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await getMemoryData();
+  //     console.log("Memory 데이터:", res);
+  //     setData(res);
+  //   } catch (err) {
+  //     console.error("데이터 불러오기 실패:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+    const loadData = async () => {
     setLoading(true);
     try {
       const res = await getMemoryData();
-      console.log("Memory 데이터:", res);
-      setData(res);
+
+      // missions 배열에 대표 이미지 추가 (userSubmissions 중 첫 번째 있는 이미지)
+      const missionsWithImage = res.missions.map((m: any) => ({
+        ...m,
+        image: m.userSubmissions?.find((u: any) => u.image)?.image || undefined,
+      }));
+
+      setData({ ...res, missions: missionsWithImage });
+      console.log("Memory 데이터:", { ...res, missions: missionsWithImage });
     } catch (err) {
       console.error("데이터 불러오기 실패:", err);
     } finally {
@@ -99,7 +118,8 @@ const MisstonClick = (missionInstanceId: number) => {
 
 
   return (
-    <div className="pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
+    <div className="pb-[85px] h-[844px] relative mx-auto w-[390px] bg-white">
+      <div className="sticky top-0 bg-white">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -129,10 +149,31 @@ const MisstonClick = (missionInstanceId: number) => {
           </button>
         </div>
       </div>
-      {/* 게시물 */}
+      </div>
 
+          {/* 작은 카드 */}
+          {/* {data?.missions.slice(1).map((m) => (
+            <div
+              key={m.missionId}
+              className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer"
+              onClick={() => AnsClick(m.missionId)}
+            >
+              <div className="flex items-center h-full p-3">
+                <div className="flex flex-col items-start justify-start text-left">
+                  <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+                  <div className="font-gabia text-[#454343] text-[11px]">
+                    {m.text}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div> */}
+</div>
+      {/* 게시물 */}
       {/* 게시물 그리드 */}
-      <div className="pr-[23px] pl-[23px] mt-[5px]">
+      <div className="pr-[23px] pl-[23px] mt-[5px] h-[577px] pb-[17px] overflow-auto">
         <div
           className="grid gap-4 auto-rows-auto"
           style={{
@@ -223,59 +264,6 @@ const MisstonClick = (missionInstanceId: number) => {
 ))}
 
   </div>
-</div>
-
-          {/* 중간 카드 */}
-          {/* {data?.missions.slice(0, 1).map((m) => (
-            <div
-              key={m.missionId}
-              className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer"
-              onClick={() => MisstonClick(m.missionId)}
-            >
-              <div className="flex items-center h-full p-3">
-                <div className="bg-white rounded-2xl text-black w-[110px] h-[75px] flex items-center justify-center mr-3 overflow-hidden">
-                  {m.image ? (
-                    <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${m.image}`}
-                      alt="mission"
-                      className="w-full h-full object-cover rounded-2xl"
-                      onError={() => {
-                        console.error("이미지 로드 실패:", m.image);
-                      }}
-                    />
-                  ) : (
-                    <div className="text-gray-400">사진</div>
-                  )}
-                </div>
-                <div className="flex flex-col items-start justify-start text-left">
-                  <span className="text-[13px] text-[#3A290D]">{m.title}</span>
-                  <div className="font-gabia text-[#454343] text-[12px]">
-                    {m.text}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))} */}
-
-          {/* 작은 카드 */}
-          {/* {data?.missions.slice(1).map((m) => (
-            <div
-              key={m.missionId}
-              className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer"
-              onClick={() => AnsClick(m.missionId)}
-            >
-              <div className="flex items-center h-full p-3">
-                <div className="flex flex-col items-start justify-start text-left">
-                  <span className="text-[13px] text-[#3A290D]">{m.title}</span>
-                  <div className="font-gabia text-[#454343] text-[11px]">
-                    {m.text}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div> */}
 </div>
       <button
         type="button"
