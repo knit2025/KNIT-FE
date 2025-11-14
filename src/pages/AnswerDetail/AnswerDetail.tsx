@@ -4,69 +4,59 @@ import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
 import { getQuestionAnswers } from "../../lib/api/question";
+import axios from "axios";
+
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+//오늘의 인스턴스 아이디: 3
 
 interface Answer {
   answerId: number;
   userName: string;
   content: string;
   createdAt: string;
+  isAnonymous?: boolean;
+  text: string;
 }
 
 const AnswerDetail = () => {
-  // const navigate = useNavigate();
   const { customQId } = useParams<{ customQId: string }>();
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAnswers = async () => {
-      if (!customQId) return;
+useEffect(() => {
+  const fetchAnswers = async () => {
+    if (!customQId) return;
 
-      try {
-        setLoading(true);
-        const data = await getQuestionAnswers(Number(customQId));
-        console.log("답변 목록:", data);
-        setAnswers(data);
-      } catch (err: unknown) {
-        console.error("답변 불러오기 실패:", err);
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("로그인이 필요합니다.");
 
-        // 🟢 임시: 더미 데이터
-        setAnswers([
-          {
-            answerId: 1,
-            userName: "엄마",
-            content:
-              "오늘 아침 모두가 바빠 보이길래, 출근·등교 전 간단하지만 든든한 아침을 챙겨줬어요.",
-            createdAt: new Date().toISOString(),
-          },
-          {
-            answerId: 2,
-            userName: "아빠",
-            content: "퇴근 후 집안일 도와주고 저녁 설거지를 했어요.",
-            createdAt: new Date().toISOString(),
-          },
-          {
-            answerId: 3,
-            userName: "딸",
-            content: "동생 숙제 도와줬어요!",
-            createdAt: new Date().toISOString(),
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const instanceId = Number(customQId);
+      // const res = await axios.get(`${baseURL}/adminqa/${instanceId}/answers`, {
+        // headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.get(`${baseURL}/adminqa/3/answers`, {
+        headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYzMTIzNTAxLCJpYXQiOjE3NjMxMTYzMDEsImp0aSI6ImFmYmI0MTZmMzU3NjRiZTliODUzMDQyZGI5MjY4NzE3IiwidXNlcl9pZCI6IjEyIn0.nCBZpJGs7yCtKWEMnFAH4DMmIiJ2XrE5MSS7zFA1DAQ` },
+      });
 
-    fetchAnswers();
-  }, [customQId]);
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-[#3A290D]">로딩 중...</div>
-      </div>
-    );
-  }
+      //익명 처리
+      const processedAnswers: Answer[] = res.data.answers.map((a: any) => ({
+        ...a,
+        userName: a.isAnonymous ? "익명" : a.userName,
+      }));
+
+      setAnswers(processedAnswers); // 반드시 상태에 반영
+    } catch (err) {
+      console.error("답변 불러오기 실패:", err);
+      setError("답변 불러오기 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAnswers();
+}, [customQId]);
 
   return (
     <div className="min-h-screen relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden">
@@ -82,17 +72,15 @@ const AnswerDetail = () => {
         <div className="w-[342px] max-h-[495px] min-h-[200px] pb-[30px] bg-[#E6D0C1] text-left rounded-2xl text-black">
           <div className="ml-[23px] mr-[23px]">
             <div className="text-[#3A290D] font-bold pt-[28px]">
-              오늘 내가 가족에게 베푼 작은 친절은?
+              {answers.text}
             </div>
-            {answers.length > 0 ? (
+          {answers.length > 0 ? (
               answers.map((answer) => (
                 <div key={answer.answerId} className="pt-2.5">
                   <div className="text-[13px] font-gabia text-[#3A290D] mb-2 mt-5">
-                    {" "}
                     {answer.userName}
                   </div>
                   <div className="text-black font-gabia text-[11px] w-70">
-                    {" "}
                     {answer.content}
                   </div>
                 </div>
@@ -102,18 +90,6 @@ const AnswerDetail = () => {
                 아직 답변이 없습니다.
               </div>
             )}
-            {/* <div className='pt-2.5'>
-          <div className='text-[13px] font-gabia text-[#3A290D] mb-2 mt-5'>엄마</div>
-            <div className='text-black font-gabia text-[11px] w-70'>오늘 아침 모두가 바빠 보이길래, 출근·등교 전 
-간단하지만 든든한 아침을 챙겨줬어요. 작은 일이지만, 하루를 기분 좋게 시작하는 데 
-도움이 되었으면 좋겠어요</div>
-</div>
-          <div className='pt-2.5'>
-          <div className='text-[13px] font-gabia text-[#3A290D] mb-2 mt-5'>엄마</div>
-            <div className='text-black font-gabia text-[11px] w-70'>오늘 아침 모두가 바빠 보이길래, 출근·등교 전 
-간단하지만 든든한 아침을 챙겨줬어요. 작은 일이지만, 하루를 기분 좋게 시작하는 데 
-도움이 되었으면 좋겠어요</div>
-</div> */}
           </div>
         </div>
       </div>

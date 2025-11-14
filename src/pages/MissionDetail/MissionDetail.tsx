@@ -100,12 +100,6 @@ const MissionDetail = () => {
           ))
         ) : (
           <>
-            <div className="bg-[#E7E7E7] w-[128px] h-[126px] rounded-2xl text-black flex justify-center items-center">
-              사진
-            </div>
-            <div className="bg-[#E7E7E7] w-[128px] h-[126px] rounded-2xl text-black flex justify-center items-center">
-              사진
-            </div>
           </>
         )}
       </div>
