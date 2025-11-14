@@ -72,7 +72,7 @@ const PhotoDetail = () => {
   }
 
   return (
-    <div className="overflow-y-auto pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
+    <div className="pb-[85px] h-[844px] min-h-sc relative mx-auto w-[390px] bg-white">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -96,7 +96,7 @@ const PhotoDetail = () => {
           )}
         </div>
       </div>
-      <div className="min-h-screen relative mx-auto h-[844px] w-[390px] overflow-hidden rounded-t-[35px] text-left bg-[#F2E7DF]">
+      <div className=" min-h-screen relative mx-auto h-[844px] w-[390px] overflow-hidden rounded-t-[35px] text-left bg-[#F2E7DF]">
         <div className="flex justify-center pt-[15px]">
           <div className="bg-[#DEB99F] w-[39px] h-[6px] rounded-2xl"></div>
         </div>
