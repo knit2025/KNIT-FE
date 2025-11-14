@@ -6,6 +6,14 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
+type familyUser = {
+  id: number;
+  name: string;
+  nickname: string;
+  role: string;
+  birth: string;
+};
+
 type TodayQuestion = {
   instanceId: number;
   content: string;
@@ -29,12 +37,48 @@ type AnswerList = {
 
 const TodayKindness: React.FC = () => {
   const [familyList, setFamilyList] = useState<string[]>([]);
+  const [familyMembers, setFamilyMembers] = useState<familyUser[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [question, setQuestion] = useState<string>("");
   const [instanceId, setInstanceId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // const [questionInfo, setQuestionInfo] = useState<TodayQuestion | null>(null);
+
+  const familyId = Number(localStorage.getItem("familyId"));
+
+  const fetchFamilyMembers = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get(`${baseURL}/accounts/family`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const members = res.data.users;
+      setFamilyMembers(members);
+
+      setFamilyList(members.map((user: familyUser) => user.role));
+    } catch (err) {
+      console.error("가족 구성원 불러오기 실패:", err);
+    }
+  };
+
+  const addFamilyPoints = async (questionId: number) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await axios.post(
+        `${baseURL}/adminqa/family/points`,
+        { familyId: familyId, questionId: questionId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("포인트 적립 성공:", res.data);
+    } catch (err) {
+      console.error("포인트 적립 실패:", err);
+    }
+  };
 
   const fetchAnswerList = async (instanceId: number) => {
     try {
@@ -46,24 +90,30 @@ const TodayKindness: React.FC = () => {
         }
       );
 
-      const serverAnswers = res.data.answers;
-
-      const names = serverAnswers.map((item) => item.userName);
-      setFamilyList(names);
+      const data = res.data;
 
       const answerMap: Record<string, string> = {};
-      serverAnswers.forEach((item) => {
+
+      data.answers.forEach((item) => {
         answerMap[item.userName] = item.content;
       });
 
       setAnswers(answerMap);
+      if (data.allAnswered) {
+        await addFamilyPoints(instanceId);
+      }
     } catch (err) {
       console.error("답변 목록 불러오기 실패:", err);
     }
   };
 
-  const handleSave = async (name: string, text: string) => {
-    setAnswers((prev) => ({ ...prev, [name]: text }));
+  const handleSave = async (role: string, text: string) => {
+    const member = familyMembers.find((m) => m.role === role);
+    if (!member) return;
+
+    const userNameKey = member.name;
+
+    setAnswers((prev) => ({ ...prev, [userNameKey]: text }));
 
     if (!instanceId) {
       return;
@@ -85,6 +135,7 @@ const TodayKindness: React.FC = () => {
         }
       );
       console.log("답변 저장 성공:", res.data);
+      await fetchAnswerList(instanceId);
     } catch (err) {
       console.error("답변 저장 실패:", err);
     }
@@ -114,7 +165,8 @@ const TodayKindness: React.FC = () => {
         const data = res.data;
         setQuestion(data.content);
         setInstanceId(data.instanceId);
-        await fetchAnswerList(data.instanceId);
+
+        await fetchFamilyMembers();
         // setQuestionInfo(data);
       } catch (err) {
         console.error("오늘의 질문 불러오기 실패:", err);
@@ -127,29 +179,36 @@ const TodayKindness: React.FC = () => {
     fetchTodayQuestion();
   }, []);
 
+  useEffect(() => {
+    if (instanceId && familyMembers.length > 0) {
+      fetchAnswerList(instanceId);
+    }
+  }, [instanceId, familyMembers]);
+
   return (
     <div className="relative mx-auto w-[390px] h-screen overflow-hidden flex flex-col items-center bg-white">
-      <p className="font-gabia text-[#3A290D] text-[1.5rem] pt-20 pb-10">
-        "{question}"
-      </p>
       {loading ? (
         <p className="text-sm text-[#846F5E] pb-6">질문 불러오는 중...</p>
       ) : error ? (
         <p className="text-sm text-red-500 pb-6">{error}</p>
       ) : (
-        <p className="font-gabia text-[#3A290D] text-[0.95rem] pb-6 text-center px-6 leading-relaxed">
+        <p className=" w-[18rem] font-gabia text-[#3A290D] text-[1.5rem] pt-20 pb-10">
           " {question} "
         </p>
       )}
       <div className="flex flex-col items-center w-full">
-        {familyList.map((name) => (
-          <KindnessBox
-            key={name}
-            family={name}
-            content={answers[name] || ""}
-            onSave={handleSave}
-          />
-        ))}
+        {familyList.map((role) => {
+          const member = familyMembers.find((m) => m.role === role);
+          const userNameKey = member?.name ?? "";
+          return (
+            <KindnessBox
+              key={role}
+              family={role}
+              content={answers[userNameKey] || ""}
+              onSave={handleSave}
+            />
+          );
+        })}
       </div>
       <Footer />
     </div>
