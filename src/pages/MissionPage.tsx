@@ -5,6 +5,7 @@ import missionMarker from "../assets/missionMarker.svg";
 import { PATHS } from '../routes';
 import { useNavigate } from 'react-router-dom';
 import { getTodayMission, getCompletedMissions, type TodayMissionResponse, type CompletedMission } from '../api/missions';
+import { isMissionCompletedToday } from '../utils/missionStorage';
 
 interface Mission {
   id: string;
@@ -20,11 +21,17 @@ export const MissionPage = () => {
   const [completedMissions, setCompletedMissions] = useState<CompletedMission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [localMissionCompleted, setLocalMissionCompleted] = useState(false);
 
   useEffect(() => {
     const fetchMissions = async () => {
       try {
         setLoading(true);
+
+        // 로컬 스토리지에서 오늘 미션 완료 여부 확인 (자정 이후 자동 초기화됨)
+        const isLocalCompleted = isMissionCompletedToday();
+        setLocalMissionCompleted(isLocalCompleted);
+
         const [today, completed] = await Promise.all([
           getTodayMission(),
           getCompletedMissions()
@@ -75,19 +82,31 @@ export const MissionPage = () => {
               </h1>
             </div>
 
-            <p className="text-[14px] font-semibold text-[#3A290D] mb-[16px]">
-              {todayMission.content}
-            </p>
+            {localMissionCompleted || todayMission.isCompleted ? (
+              <div className="flex flex-col items-center justify-center h-[90px]">
+                <p className="text-[16px] font-semibold text-[#3A290D] text-center">
+                  오늘의 미션을 완수했습니다! 🎉
+                </p>
+                <p className="text-[12px] text-[#3A290D] mt-2 text-center">
+                  내일 새로운 미션으로 만나요
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="text-[14px] font-semibold text-[#3A290D] mb-[16px]">
+                  {todayMission.content}
+                </p>
 
-            <button
-              className="w-[285px] h-[37px] bg-white rounded-[17px] flex items-center justify-center cursor-pointer"
-              onClick={() => navigate(PATHS.todayMission)}
-              disabled={todayMission.isCompleted}
-            >
-              <span className="text-[16px] font-semibold text-[#3A290D]">
-                {todayMission.isCompleted ? '미션 완료' : '미션 인증'}
-              </span>
-            </button>
+                <button
+                  className="w-[285px] h-[37px] bg-white rounded-[17px] flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => navigate(PATHS.todayMission)}
+                >
+                  <span className="text-[16px] font-semibold text-[#3A290D]">
+                    미션 인증
+                  </span>
+                </button>
+              </>
+            )}
           </div>
         )}
 

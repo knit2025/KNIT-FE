@@ -25,21 +25,56 @@ const SelectRole: React.FC = () => {
   const [inviteCode, setInviteCode] = useState<string>(state.familyCode ?? "");
 
   const handleSignUp = async () => {
-    await axios.post(`${baseURL}/accounts/signup`, {
-      loginId: state.loginId,
-      password: state.password,
-      name: state.name,
-      birth: state.birth,
-      familyCode: state.familyCode,
-      role,
-      nickname,
-    });
-    console.log("회원가입 완료!");
-    navigate("/login");
+    // 입력값 검증
+    if (!role) {
+      alert("역할을 선택해주세요.");
+      return;
+    }
+    if (!nickname.trim()) {
+      alert("호칭을 입력해주세요.");
+      return;
+    }
+
+    try {
+      console.log("회원가입 요청 데이터:", {
+        loginId: state.loginId,
+        password: state.password,
+        name: state.name,
+        birth: state.birth,
+        familyCode: inviteCode || state.familyCode || null,
+        role,
+        nickname,
+      });
+
+      const response = await axios.post(`${baseURL}/accounts/signup`, {
+        loginId: state.loginId,
+        password: state.password,
+        name: state.name,
+        birth: state.birth,
+        familyCode: inviteCode || state.familyCode || null,
+        role,
+        nickname,
+      });
+
+      console.log("회원가입 완료!", response.data);
+      alert("회원가입이 완료되었습니다!");
+      navigate("/Login");
+    } catch (error) {
+      console.error("회원가입 실패:", error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message ||
+                            error.response?.data?.error ||
+                            "회원가입에 실패했습니다.";
+        console.error("에러 응답:", error.response?.data);
+        alert(errorMessage);
+      } else {
+        alert("회원가입에 실패했습니다.");
+      }
+    }
   };
 
   return (
-    <div className="w-[390px] h-screen flex flex-col gap-10 justify-center items-center bg-linear-to-b from-[#ECD6C7] to-white">
+    <div className="relative mx-auto w-[390px] h-screen flex flex-col gap-10 justify-center items-center bg-linear-to-b from-[#ECD6C7] to-white">
       <div className="flex text-left w-78 flex-col gap-3">
         <p className="text-[#3A290D] text-[0.875rem] font-gabia">
           당신은 가족 안에서 어떤 역할을 하고 있나요?
