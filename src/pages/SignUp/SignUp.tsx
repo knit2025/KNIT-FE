@@ -5,7 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-const API = "https://junhong.shop";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 type SignupLocationState = {
   loginId?: string;
@@ -35,7 +35,7 @@ const SignUp: React.FC = () => {
 
   const handleCheckId = async () => {
     try {
-      const res = await axios.get(`${API}/accounts/checkId`, {
+      const res = await axios.get(`${baseURL}/accounts/checkId`, {
         params: { loginId },
       });
       if (res.data.message === "ok ") {
@@ -49,7 +49,7 @@ const SignUp: React.FC = () => {
   };
 
   const handleCreateFamilyCode = async () => {
-    const res = await axios.post(`${API}/accounts/code`);
+    const res = await axios.post(`${baseURL}/accounts/code`);
     console.log("가족코드:", res.data);
     setFamilyCode(res.data.familyCode);
 

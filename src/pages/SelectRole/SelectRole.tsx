@@ -5,7 +5,7 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const API = "https://junhong.shop";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 type LocationState = {
   loginId: string;
@@ -25,7 +25,7 @@ const SelectRole: React.FC = () => {
   const [inviteCode, setInviteCode] = useState<string>(state.familyCode ?? "");
 
   const handleSignUp = async () => {
-    await axios.post(`${API}/accounts/signup`, {
+    await axios.post(`${baseURL}/accounts/signup`, {
       loginId: state.loginId,
       password: state.password,
       name: state.name,

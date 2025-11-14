@@ -7,7 +7,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = "https://junhong.shop";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     try {
       setErrorMessage(null);
-      const response = await axios.post(`${API}/accounts/login`, {
+      const response = await axios.post(`${baseURL}/accounts/login`, {
         loginId,
         password,
       });
