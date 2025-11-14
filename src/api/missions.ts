@@ -115,7 +115,9 @@ export const checkCurrentUserSubmittedById = (items?: UserMission[]): boolean =>
         const u = JSON.parse(userRaw);
         if (u?.id != null) currentId = Number(u.id);
       }
-    } catch {}
+  } catch {
+      console.warn('현재 사용자 파싱 실패');
+    }
   }
   if (currentId == null) return false;
   return items.some((it) => it.userId === currentId && it.isSubmitted === true);

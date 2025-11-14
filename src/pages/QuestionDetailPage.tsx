@@ -108,7 +108,10 @@ QuestionDetailPageProps) => {
               // 답변이 없고, 현재 사용자가 작성자가 아닌 경우에만 편집 가능
               !existingAnswer && !(currentUserId != null && question.fromUserId != null && currentUserId === question.fromUserId)
             }
-            showAnswerButton={!(currentUserId != null && question.fromUserId != null && currentUserId === question.fromUserId)}
+            showAnswerButton={
+              // 답변이 이미 있으면 버튼 숨김, 작성자 본인도 숨김
+              !existingAnswer && !(currentUserId != null && question.fromUserId != null && currentUserId === question.fromUserId)
+            }
             answerValue={answer}
             onChangeAnswer={setAnswer}
           />
