@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
       <div className="flex justify-center items-center gap-10">
         <div
           className="cursor-pointer"
-          onClick={() => navigate("/kindness")}
+          onClick={() => navigate("/knitting")}
           role="button"
           aria-label="오늘의 질문으로 이동"
         >

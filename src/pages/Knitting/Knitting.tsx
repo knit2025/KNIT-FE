@@ -10,8 +10,15 @@ const Knitting: React.FC = () => {
 
   useEffect(() => {
     const id = setInterval(() => {
-      setCurrentIndex((i) => (i + 1) % images.length);
+      setCurrentIndex((i) => {
+        const nextIndex = (i + 1) % images.length;
+        if (nextIndex === 0) {
+          window.location.href = "/kindness";
+        }
+        return nextIndex;
+      });
     }, 1000);
+
     return () => clearInterval(id);
   }, [images.length]);
 
