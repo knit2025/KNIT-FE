@@ -1,63 +1,67 @@
 import { useEffect, useState } from 'react';
 import { QuestionCardStack } from '../components/QuestionCard/QuestionCardStack';
 import type { Question, FamilyRole } from '../types/question';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, type Location } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import PlusIcon from '../assets/add 2.png'
 import { PATHS } from '../routes';
 import Footer from '../components/Footer/Footer';
 import { getQuestionCards, mapApiToQuestion, getQuestionAnswer } from '../api/questions';
-import { getCurrentUserRole } from '../api/config';
+import { useMemo } from 'react';
 
 
 export const QuestionListPage = () => {
   const navigate = useNavigate();
-  const location = useLocation() as any; // state + pathname 접근 단순 캐스팅
+  const location = useLocation() as Location & { state?: { newQuestion?: Question } };
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortByAnswerable, setSortByAnswerable] = useState(false); // 답변 가능한 질문 정렬 상태
 
-  // 현재 사용자가 답변할 수 있는 질문인지 확인하는 함수
+  const currentUserId = useMemo(() => {
+    const v = localStorage.getItem('currentUserId');
+    return v ? Number(v) : undefined;
+  }, []);
+
+  // 현재 사용자가 답변할 수 있는 질문인지 확인 (ID 기준)
   const canAnswerQuestion = (question: Question): boolean => {
-    const currentUserRole = getCurrentUserRole();
-    if (!currentUserRole) return false;
-
-    // 이미 답변된 질문은 답변 불가
-    if (question.answer) return false;
-
-    // targetRole에서 "에게" 제거하여 비교 (예: "엄마에게" -> "엄마")
-    const targetRole = question.targetRole.replace('에게', '');
-
-    // "모두에게"인 경우 모두 답변 가능
-    if (question.targetRole === '모두에게') return true;
-
-    // 현재 사용자의 역할이 질문의 대상과 일치하는 경우에만 답변 가능
-    return currentUserRole === targetRole;
+    if (question.answer) return false; // 이미 답변됨
+    if (currentUserId == null) return false;
+    if (question.fromUserId != null && question.fromUserId === currentUserId) return false; // 작성자는 불가
+    if (question.toUserId == null) return true; // 모두에게
+    return question.toUserId === currentUserId; // 대상자가 현재 사용자
   };
 
   // API에서 질문 목록 불러오기
+  // 서버는 비공개(isPublic=false) 질문을 자동으로 필터링하여 반환합니다
+  // - 작성자 또는 대상인 경우에만 비공개 질문이 포함됨
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
         const data = await getQuestionCards();
 
-        // API 데이터를 Question 타입으로 변환하고 답변 가져오기
+        // 404: 질문이 없는 경우 빈 배열로 처리
+        if (!data || data.length === 0) {
+          setAllQuestions([]);
+          return;
+        }
+
+        // API 데이터를 Question 타입으로 변환하고, 가능한 경우 답변을 조회하여 주입
         const questionsWithAnswers = await Promise.all(
           data.map(async (apiData) => {
             const question = mapApiToQuestion(apiData);
 
-            // isAnswered가 true인 경우에만 답변 조회
-            if (apiData.isAnswered) {
-              try {
-                const answerData = await getQuestionAnswer(question.id);
+            try {
+              const answerData = await getQuestionAnswer(question.id);
+              if (answerData?.answerText) {
                 question.answer = answerData.answerText;
                 question.answeredBy = answerData.answerBy as FamilyRole;
-              } catch (err) {
-                console.error(`질문 ${question.id}의 답변 조회 실패:`, err);
               }
+            } catch {
+              // 404 등 답변이 없으면 무시하고 진행
+              // console.debug(`답변 없음 또는 조회 실패(${question.id}):`, err);
             }
 
             return question;
@@ -66,7 +70,14 @@ export const QuestionListPage = () => {
 
         setAllQuestions(questionsWithAnswers);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다');
+        console.error('질문 목록 조회 실패:', err);
+        // 404 에러는 질문이 없는 것으로 처리
+        if (err instanceof Error && err.message.includes('404')) {
+          setAllQuestions([]);
+          setError(null);
+        } else {
+          setError(err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다');
+        }
       } finally {
         setLoading(false);
       }
@@ -78,11 +89,10 @@ export const QuestionListPage = () => {
   // 답변 가능한 질문을 상단으로 정렬
   const sortedQuestions = sortByAnswerable
     ? [...allQuestions].sort((a, b) => {
-        const aCanAnswer = canAnswerQuestion(a);
-        const bCanAnswer = canAnswerQuestion(b);
-        if (aCanAnswer && !bCanAnswer) return -1;
-        if (!aCanAnswer && bCanAnswer) return 1;
-        return 0;
+        // 아직 답변 안했고(toUserId == currentUserId) 우선
+        const aScore = (a.answer ? 0 : 1) + (a.toUserId === currentUserId ? 2 : 0);
+        const bScore = (b.answer ? 0 : 1) + (b.toUserId === currentUserId ? 2 : 0);
+        return bScore - aScore;
       })
     : allQuestions;
 
@@ -129,19 +139,17 @@ export const QuestionListPage = () => {
 
       {/* 카드 스택 영역: 스택 자체는 스와이프/휠로만 이동 (스크롤 X) */}
       <div
-        className="absolute top-[191px] left-[25px] w-[340px] h-[443px] overflow-hidden"
+        className="absolute top-[191px] left-[25px] w-[340px] h-[570px] overflow-hidden"
       >
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-[#A9927F]">질문을 불러오는 중...</p>
           </div>
-        ) :
-        // error ? (
-        //   <div className="flex items-center justify-center h-full">
-        //     <p className="text-red-400">{error}</p>
-        //   </div>
-        // ) :
-        sortedQuestions.length > 0 ? (
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-red-400">{error}</p>
+          </div>
+        ) : sortedQuestions.length > 0 ? (
           <QuestionCardStack
             questions={sortedQuestions}
             onCardSelect={handleAnswerClick}

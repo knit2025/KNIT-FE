@@ -1,12 +1,66 @@
 import { API_BASE_URL, getAuthHeaders } from './config';
 // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+/**
+ * 현재 로그인한 사용자의 loginId 가져오기
+ * localStorage에서 user.loginId를 파싱하여 반환
+ */
+const getCurrentUserLoginId = (): string | null => {
+  const userStr = localStorage.getItem('user');
+  if (!userStr) return null;
+
+  try {
+    const user = JSON.parse(userStr);
+    return user.loginId || null;
+  } catch (error) {
+    console.error('사용자 정보 파싱 에러:', error);
+    return null;
+  }
+};
+
+/**
+ * 서버 응답의 userSubmissions에서 현재 사용자가 제출했는지 확인
+ * userName이 현재 loginId와 일치하고 isSubmitted가 true인 경우 제출한 것으로 판단
+ *
+ * @param userSubmissions - 서버에서 받은 제출 현황
+ * @returns 현재 사용자가 제출했으면 true, 아니면 false
+ */
+export const checkCurrentUserSubmitted = (userSubmissions?: UserSubmission[]): boolean => {
+  if (!userSubmissions || userSubmissions.length === 0) return false;
+
+  const currentLoginId = getCurrentUserLoginId();
+  if (!currentLoginId) return false;
+
+  // userName이 현재 loginId와 일치하고 isSubmitted가 true인 경우
+  return userSubmissions.some(
+    submission => submission.userName === currentLoginId && submission.isSubmitted === true
+  );
+};
+
+export interface UserMission {
+  userId: number;
+  userName?: string; // 서버 필드가 다양할 수 있어 유연하게
+  username?: string;
+  nickName?: string;
+  nickname?: string;
+  isSubmitted?: boolean;
+  opinion?: string;
+  image?: string;
+  createdAt?: string;
+  updateAt?: string;
+}
+
 export interface TodayMissionResponse {
   missionId: number;
   missionInstanceId: number;
   title: string;
   content: string;
-  isCompleted: boolean;
+  // 신규 스펙: userMissions 배열 제공 (userId 기반)
+  userMissions?: UserMission[];
+  // 구 스펙 호환: 일부 환경에서 userSubmissions를 사용할 수 있음
+  userSubmissions?: UserSubmission[];
+  // isCompleted는 가족 전체 완료 여부를 나타내므로 제거
+  // 개인의 제출 여부는 userSubmissions의 isSubmitted로 확인
 }
 
 export interface CompletedMission {
@@ -24,15 +78,18 @@ export interface MissionSubmitRequest {
 
 export interface MissionSubmitResponse {
   message: string;
-  isCompleted: boolean;
+  // isCompleted 제거 - 개인의 제출 여부는 localStorage로 관리
 }
 
 export interface UserSubmission {
   userId: number;
-  userName: string;
+  userName: string; // 서버에서 제공하는 loginId와 비교할 사용자명
+  nickName?: string;
+  isSubmitted?: boolean; // 해당 사용자의 제출 여부
   opinion: string;
   image: string;
   createdAt: string;
+  updateAt?: string;
 }
 
 export interface MissionDetailResponse {
@@ -44,7 +101,32 @@ export interface MissionDetailResponse {
 }
 
 /**
+ * 현재 사용자가 제출했는지(userId 기반) 확인
+ */
+export const checkCurrentUserSubmittedById = (items?: UserMission[]): boolean => {
+  if (!items || items.length === 0) return false;
+  // currentUserId 우선, 없으면 user.id 보조
+  const idStr = localStorage.getItem('currentUserId');
+  let currentId: number | undefined = idStr ? Number(idStr) : undefined;
+  if (currentId == null) {
+    try {
+      const userRaw = localStorage.getItem('user');
+      if (userRaw) {
+        const u = JSON.parse(userRaw);
+        if (u?.id != null) currentId = Number(u.id);
+      }
+  } catch {
+      console.warn('현재 사용자 파싱 실패');
+    }
+  }
+  if (currentId == null) return false;
+  return items.some((it) => it.userId === currentId && it.isSubmitted === true);
+};
+
+/**
  * 오늘의 미션 조회
+ * 서버 응답의 userSubmissions에서 현재 사용자의 제출 여부를 확인합니다.
+ * (userName === loginId && isSubmitted === true)
  *
  * @returns {Promise<TodayMissionResponse>} 오늘의 미션 정보
  * @throws {Error} 인증 실패, 미션 없음, 기타 에러
@@ -76,6 +158,7 @@ export const getTodayMission = async (): Promise<TodayMissionResponse> => {
 
     const data = await response.json();
     console.log('오늘의 미션 데이터:', data);
+
     return data;
   } catch (error) {
     console.error('오늘의 미션 조회 에러:', error);

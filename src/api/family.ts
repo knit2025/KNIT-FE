@@ -6,6 +6,7 @@ export interface FamilyMember {
   nickname: string;
   role: string;
   birth: string;
+  loginId?: string; // 사용자의 로그인 ID
 }
 
 export interface FamilyResponse {
@@ -62,7 +63,17 @@ export const getCurrentUser = (): FamilyMember | null => {
   if (!userStr) return null;
 
   try {
-    return JSON.parse(userStr);
+    const raw = JSON.parse(userStr) as Partial<FamilyMember> & { id?: number | string };
+    // id 타입을 강제로 number로 정규화하여 비교 일치 보장
+    const normalized: FamilyMember = {
+      id: typeof raw.id === 'string' ? Number(raw.id) : (raw.id ?? NaN),
+      name: raw.name ?? '',
+      nickname: raw.nickname ?? '',
+      role: raw.role ?? '',
+      birth: raw.birth ?? '',
+    };
+
+    return normalized;
   } catch (error) {
     console.error('사용자 정보 파싱 에러:', error);
     return null;

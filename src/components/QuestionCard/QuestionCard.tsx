@@ -1,5 +1,14 @@
 import type { Question } from '../../types/question';
 
+// 받침 여부에 따라 '이/가' 선택
+function josaIGA(word: string) {
+  if (!word) return '이';
+  const code = word.charCodeAt(word.length - 1);
+  if (code < 0xac00 || code > 0xd7a3) return '이';
+  const jong = (code - 0xac00) % 28;
+  return jong === 0 ? '가' : '이';
+}
+
 interface QuestionCardProps {
   question: Question;
   onClick?: () => void;
@@ -40,7 +49,16 @@ export const QuestionCard = ({
       {/* 헤더 */}
         <div className="flex justify-between mb-[25px]">
           <h3 className="text-[13px] font-semibold tracking-[0.05em] text-brand">
-            {question.targetRole} {question.authorRole}이 궁금한 점
+            {question.revealAuthor ? (
+              <>
+                {question.authorRole}
+                {josaIGA(question.authorRole)} {question.targetRole} 궁금한 점
+              </>
+            ) : (
+              <>
+                {question.targetRole} 궁금한 점
+              </>
+            )}
           </h3>
           {!editable && showAnswerButton && (
             <button
@@ -83,9 +101,14 @@ export const QuestionCard = ({
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <p className="flex-1 text-left text-[12px] text-brand/50 whitespace-pre-wrap scroll-container select-none">
-                {question.answer?.trim() ? question.answer : '아직 답변을 작성되지 않았어요.'}
-              </p>
+              (() => {
+                const display = (answerValue ?? question.answer ?? '').trim();
+                return (
+                  <p className="flex-1 text-left text-[12px] text-brand/50 whitespace-pre-wrap scroll-container select-none">
+                    {display || '아직 답변이 등록되지 않았어요.'}
+                  </p>
+                );
+              })()
             )}
           </section>
         </div>
