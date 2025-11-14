@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // import React from 'react';
 import DotIcon from "../../assets/Ellipse 12.svg";
 import PlusIcon from "../../assets/add 2.png";

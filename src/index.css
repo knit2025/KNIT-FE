@@ -57,9 +57,36 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* 페이지 전체 스크롤 비활성화 (바디만 잠금) */
+  html {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
   body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* 페이지 자체 스크롤 금지 */
+    overscroll-behavior: none; /* 상위로 스크롤 전파 방지 */
+    position: fixed; /* 모바일 사파리 배경 스크롤 방지 */
+    inset: 0;
     font-family: var(--font-sans);
     color: var(--color-text);
     background-color: var(--color-bg);
+  }
+
+  /* React root: 뷰포트 채움 */
+  #root {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* 내부 스크롤 허용 유틸리티 */
+@layer utilities {
+  .scroll-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
