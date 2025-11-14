@@ -108,8 +108,10 @@ export const CreateQuestionPage = () => {
       // QuestionListPage에서 자동으로 새로고침되므로 state 전달 불필요
       navigate(PATHS.questionList);
     } catch (error) {
-      console.error('질문 생성 실패:', error);
-      alert(error instanceof Error ? error.message : '질문 생성에 실패했습니다');
+      console.error("질문 생성 실패:", error);
+      alert(
+        error instanceof Error ? error.message : "질문 생성에 실패했습니다"
+      );
       setIsSubmitting(false);
     }
   }, [formData, navigate, isSubmitting, idToRoleMap]);
@@ -243,7 +245,13 @@ export const CreateQuestionPage = () => {
             </PrimaryButton>
           </div>
 
+        {/* 생성 완료 버튼 - 40px 높이 */}
+        <div className="absolute top-[682px] left-[46px] w-[298px] h-[40px]">
+          <PrimaryButton onClick={handleSubmit} disabled={!canSubmit}>
+            생성 완료
+          </PrimaryButton>
         </div>
+      </div>
 
       {/* 하단 푸터 */}
       <Footer />

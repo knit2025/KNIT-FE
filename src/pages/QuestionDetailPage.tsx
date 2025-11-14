@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import type { Question } from '../types/question';
-import Header from '../components/Header/Header';
-import { QuestionCard } from '../components/QuestionCard/QuestionCard';
-import PrimaryButton from '../components/Question/PrimaryButton';
-import Footer from '../components/Footer/Footer';
-import { createQuestionAnswer, getQuestionAnswer } from '../api/questions';
+import { useState, useEffect } from "react";
+import type { Question } from "../types/question";
+import Header from "../components/Header/Header";
+import { QuestionCard } from "../components/QuestionCard/QuestionCard";
+import PrimaryButton from "../components/Question/PrimaryButton";
+import Footer from "../components/Footer/Footer";
+import { createQuestionAnswer, getQuestionAnswer } from "../api/questions";
 
 interface QuestionDetailPageProps {
   question: Question;
@@ -14,9 +14,9 @@ interface QuestionDetailPageProps {
 
 export const QuestionDetailPage = ({
   question,
-  onSubmit,
-}: QuestionDetailPageProps) => {
-  const [answer, setAnswer] = useState('');
+}: // onSubmit,
+QuestionDetailPageProps) => {
+  const [answer, setAnswer] = useState("");
   const [existingAnswer, setExistingAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +38,7 @@ export const QuestionDetailPage = ({
         setAnswer(answerData.answerText);
       } catch (err) {
         // 답변이 없는 경우 에러가 발생할 수 있음 (정상)
-        console.log('답변이 아직 없습니다:', err);
+        console.log("답변이 아직 없습니다:", err);
       } finally {
         setLoading(false);
       }
@@ -49,14 +49,14 @@ export const QuestionDetailPage = ({
 
   const handleSubmit = () => {
     if (answer.trim()) {
-      createQuestionAnswer(question.id ,answer);
+      createQuestionAnswer(question.id, answer);
     }
   };
 
   if (loading) {
     return (
       <div className="relative w-[390px] min-h-screen mx-auto text-left bg-white">
-        <Header/>
+        <Header />
         <div className="flex items-center justify-center h-screen">
           <p className="text-[#A9927F]">질문을 불러오는 중...</p>
         </div>
@@ -67,14 +67,15 @@ export const QuestionDetailPage = ({
 
   return (
     <div className="relative w-[390px] min-h-screen mx-auto text-left bg-white">
-      <Header/>
+      <Header />
       <div className="pointer-events-none absolute left-0 top-0 w-full h-[110px] bg-white z-40" />
 
       <div className="absolute inset-x-0 top-0 bottom-[140px] scroll-container">
-
         {/* 제목 */}
         <h1 className="absolute top-[136px] left-[26px] text-[20px] font-semibold text-[#3A290D]">
-          {existingAnswer ? '가족의 소중한 이야기' : '당신의 이야기를 나눠주세요'}
+          {existingAnswer
+            ? "가족의 소중한 이야기"
+            : "당신의 이야기를 나눠주세요"}
         </h1>
 
         {/* 질문 카드 */}
