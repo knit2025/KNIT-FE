@@ -1,21 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
-import { getMissionDetail, type MissionDetailResponse } from "../../api/missions";
+import {
+  getMissionDetail,
+  type MissionDetailResponse,
+} from "../../api/missions";
 // import { API_BASE_URL } from "../../api/config";
 
 const MissionDetail = () => {
   const { missionId } = useParams<{ missionId: string }>();
-  const [missionData, setMissionData] = useState<MissionDetailResponse | null>(null);
+  const [missionData, setMissionData] = useState<MissionDetailResponse | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMissionDetail = async () => {
       if (!missionId) {
-        setError('미션 ID가 없습니다.');
+        setError("미션 ID가 없습니다.");
         setLoading(false);
         return;
       }
@@ -25,8 +30,10 @@ const MissionDetail = () => {
         const data = await getMissionDetail(Number(missionId));
         setMissionData(data);
       } catch (err) {
-        console.error('미션 상세 조회 실패:', err);
-        setError(err instanceof Error ? err.message : '미션을 불러오는데 실패했습니다.');
+        console.error("미션 상세 조회 실패:", err);
+        setError(
+          err instanceof Error ? err.message : "미션을 불러오는데 실패했습니다."
+        );
       } finally {
         setLoading(false);
       }
@@ -74,12 +81,14 @@ const MissionDetail = () => {
               {submission.image ? (
                 <img
                   // src={submission.image.startsWith('http') ? submission.image : `${API_BASE_URL}${submission.image}`}
-                  src={`${import.meta.env.VITE_API_BASE_URL}${submission.image}`}
+                  src={`${import.meta.env.VITE_API_BASE_URL}${
+                    submission.image
+                  }`}
                   alt={`${submission.userName}의 미션`}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
+                  onError={() => {
                     // 이미지 로드 실패 시 기본 텍스트 표시
-  console.error('이미지 로드 실패:', submission.image);
+                    console.error("이미지 로드 실패:", submission.image);
                   }}
                 />
               ) : (
@@ -99,12 +108,12 @@ const MissionDetail = () => {
         <div className="text-[#3A290D] font-bold pt-[28px] ml-[23px] mr-[23px]">
           {missionData.title}
         </div>
-        
+
         <div className="ml-[23px] mr-[23px]">
           <div className="mt-[30px] font-bold text-[#3A290D] text-[14px]">
             미션 후 소감
           </div>
-          
+
           {missionData.userSubmissions.length > 0 ? (
             missionData.userSubmissions.map((submission, index) => (
               <div key={index}>
