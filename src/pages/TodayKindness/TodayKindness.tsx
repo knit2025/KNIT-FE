@@ -20,12 +20,37 @@ const TodayKindness: React.FC = () => {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [question, setQuestion] = useState<string>("");
+  const [instanceId, setInstanceId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // const [questionInfo, setQuestionInfo] = useState<TodayQuestion | null>(null);
 
-  const handleSave = (name: string, text: string) => {
+  const handleSave = async (name: string, text: string) => {
     setAnswers((prev) => ({ ...prev, [name]: text }));
+
+    if (!instanceId) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await axios.post(
+        `${baseURL}/adminqa/answer`,
+        {
+          instanceId: instanceId,
+          content: text,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("답변 저장 성공:", res.data);
+    } catch (err) {
+      console.error("답변 저장 실패:", err);
+    }
   };
 
   useEffect(() => {
@@ -51,6 +76,7 @@ const TodayKindness: React.FC = () => {
 
         const data = res.data;
         setQuestion(data.content);
+        setInstanceId(data.instanceId);
         // setQuestionInfo(data);
       } catch (err) {
         console.error("오늘의 질문 불러오기 실패:", err);
