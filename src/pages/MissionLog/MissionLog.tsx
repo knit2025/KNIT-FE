@@ -1,4 +1,5 @@
-// import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+// import React from 'react';
 import DotIcon from "../../assets/Ellipse 12.svg";
 import PlusIcon from "../../assets/add 2.png";
 import Footer from "../../components/Footer/Footer";
@@ -6,24 +7,77 @@ import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
 import { useNavigate } from "react-router-dom";
 
+//정의
+import { getMemoryData } from "../../lib/api/memory";
+
+//호출
+interface Post {
+  postId: number;
+  text: string;
+  image: string;
+  date: string;
+  createdAt: string;
+  userId: number;
+}
+
+interface Mission {
+  missionId: number;
+  title: string;
+  text: string;
+  image?: string; //추가
+  isCompleted: boolean;
+  createdAt: string;
+  familyId: number;
+}
+
+interface FamilyQuestionInstance {
+  instanceId: number;
+  adminQId: number;
+  isCurrent: boolean;
+  status: string;
+  createdAt: string;
+  familyId: number;
+}
+
+interface MemoryData {
+  counts: { posts: number; missions: number; familyQuestionInstances: number };
+  posts: Post[];
+  missions: Mission[];
+  familyQuestionInstances: FamilyQuestionInstance[];
+}
+
+
+//네비게이션, api 호출
 const MissionLog = () => {
+
   const navigate = useNavigate();
+  const [data, setData] = useState<MemoryData | null>(null);
+
 
   const handleClick = () => {
     navigate("/AddPhoto");
   };
-  const MPhotoClick = () => {
-    navigate("/PhotoDetail");
-  };
-  const AnsClick = () => {
-    navigate("/AnswerDetail");
-  };
-  const MisstonClick = () => {
-    navigate("/MissionDetail");
-  };
+
+const MPhotoClick = (postId: number) => {
+  navigate(`/PhotoDetail/${postId}`);
+};
+const AnsClick = (missionId: number) => {
+  navigate(`/AnswerDetail/${missionId}`);
+};
+const MisstonClick = (missionId: number) => {
+  navigate(`/MissionDetail/${missionId}`);
+};
+useEffect(() => {
+  getMemoryData()
+    .then(res => {
+      console.log("Memory 데이터:", res); // ← 여기에 있어야 콘솔에 뜸
+      setData(res)
+    })
+    .catch((err) => console.error("데이터 불러오기 실패:", err));
+}, []);
 
   return (
-    <div className="min-h-screen relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden">
+    <div className="min-h-screen relative mx-auto w-[390px] bg-white ">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -53,112 +107,84 @@ const MissionLog = () => {
         </div>
       </div>
       {/* 게시물 */}
-      {/* 게시물 그리드 */}
-      <div className="pr-[23px] pl-[23px] mt-[5px]">
-        <div
-          className="grid gap-4 auto-rows-auto"
-          style={{
-            // 게시물 고정
-            gridTemplateColumns: "repeat(3, 104px)",
-            gridAutoFlow: "row dense", // 빈 공간 채우기
-          }}
-        >
-          {/* 큰 카드 */}
-          <div
-            className="col-span-3 h-[120px] rounded-2xl bg-[#F2E7DF] cursor-pointer"
-            onClick={MPhotoClick}
-          >
-            <div className="flex items-center h-full p-3">
-              <div className="bg-white rounded-2xl w-[150px] text-black h-[98px] flex items-center justify-center mr-3">
-                사진
-              </div>
-              <div className="flex flex-col items-start justify-start text-left">
-                <div className="font-semibold text-[13px] text-[#3A290D]">
-                  한달 전 오늘
-                </div>
-                <div className="font-gabia text-[#454343] text-[12px]">
-                  첫 문장
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* 중간 카드 */}
-          <div
-            className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer"
-            onClick={MisstonClick}
-          >
-            <div className="flex items-center h-full p-3">
-              <div className="bg-white rounded-2xl  text-black w-[110px] h-[75px] flex items-center justify-center mr-3">
-                사진
-              </div>
-              <div className="flex flex-col items-start justify-start text-left">
-                <span className="text-[13px] text-[#3A290D]">미션 제목</span>
-                <div className="font-gabia  text-[#454343] text-[12px]">
-                  첫 문장
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 작은 카드 */}
-          <div
-            className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer"
-            onClick={AnsClick}
-          >
-            <div className="flex items-center h-full p-3">
-              <div className="flex flex-col items-start justify-start text-left">
-                <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-                <div className="font-gabia text-[#454343] text-[11px]">
-                  우리의 답
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer"
-            onClick={AnsClick}
-          >
-            <div className="flex items-center h-full p-3">
-              <div className="flex flex-col items-start justify-start text-left">
-                <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-                <div className="font-gabia  text-[#454343] text-[11px]">
-                  우리의 답
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer"
-            onClick={AnsClick}
-          >
-            <div className="flex items-center h-full p-3">
-              <div className="flex flex-col items-start justify-start text-left">
-                <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-                <div className="font-gabia  text-[#454343] text-[11px]">
-                  우리의 답
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer"
-            onClick={AnsClick}
-          >
-            <div className="flex items-center h-full p-3">
-              <div className="flex flex-col items-start justify-start text-left">
-                <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-                <div className="font-gabia  text-[#454343] text-[11px]">
-                  우리의 답
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* ... */}
+  {/* 게시물 그리드 */}
+<div className="pr-[23px] pl-[23px] mt-[5px]">
+  <div
+    className="grid gap-4 auto-rows-auto"
+    style={{
+      // 게시물 고정
+      gridTemplateColumns: 'repeat(3, 104px)',
+      gridAutoFlow: 'row dense' // 빈 공간 채우기
+    }}
+  >
+    {/* 카드 그리드 시작 */}
+    {/* 큰 카드 */}
+    {data?.posts.map((p) => (
+    <div key={p.postId} className="col-span-3 h-[120px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={() => MPhotoClick(p.postId)}>
+      <div className="flex items-center h-full p-3">
+        <div className="bg-white rounded-2xl w-[150px] text-black h-[98px] flex items-center justify-center mr-3">{p.image ? <img src={p.image} alt="post" className="w-full h-full object-cover rounded-2xl" /> : "사진"}</div>
+        <div className="flex flex-col items-start justify-start text-left">
+          <div className="font-semibold text-[13px] text-[#3A290D]">{p.date}</div>
+          <div className="font-gabia text-[#454343] text-[12px]">{p.text}</div>
         </div>
       </div>
+    </div>
+    ))}
 
+    {/* 중간 카드 */}
+    {data?.missions.slice(0, 1).map((m) => ( 
+    <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer" onClick={() => MisstonClick(m.missionId)}>
+      <div className="flex items-center h-full p-3">
+        <div className="bg-white rounded-2xl  text-black w-[110px] h-[75px] flex items-center justify-center mr-3">{m.image ? <img src={m.image} alt="post" className="w-full h-full object-cover rounded-2xl" /> : "사진"}</div>
+        <div className="flex flex-col items-start justify-start text-left">
+          <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+          <div className="font-gabia  text-[#454343] text-[12px]">{m.text}</div>
+        </div>
+      </div>
+    </div>
+    ))}
+
+    {/* 작은 카드 */}
+    {data?.missions.slice(1).map((m) => (
+    <div key={m.missionId} className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer" onClick={() => AnsClick(m.missionId)}>
+      <div className="flex items-center h-full p-3">
+        <div className="flex flex-col items-start justify-start text-left">
+          <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+          <div className="font-gabia text-[#454343] text-[11px]">{m.text}</div>
+        </div>
+      </div>
+    </div>
+    ))}
+
+{/* 임시 박스 */}
+    {/* <div className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={AnsClick}>
+      <div className="flex items-center h-full p-3">
+        <div className="flex flex-col items-start justify-start text-left">
+          <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
+          <div className="font-gabia  text-[#454343] text-[11px]">우리의 답</div>
+        </div>
+      </div>
+    </div>
+        <div className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={AnsClick}>
+      <div className="flex items-center h-full p-3">
+        <div className="flex flex-col items-start justify-start text-left">
+          <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
+          <div className="font-gabia  text-[#454343] text-[11px]">우리의 답</div>
+        </div>
+      </div>
+    </div>
+        <div className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={AnsClick}>
+      <div className="flex items-center h-full p-3">
+        <div className="flex flex-col items-start justify-start text-left">
+          <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
+          <div className="font-gabia  text-[#454343] text-[11px]">우리의 답</div>
+        </div>
+      </div>
+    </div> */}
+    {/* ... */}
+  </div>
+</div>
       <button
         type="button"
         className="absolute right-[23px] bottom-[calc(100px+16px)] cursor-pointer z-50"

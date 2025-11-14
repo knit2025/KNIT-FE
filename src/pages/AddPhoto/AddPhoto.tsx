@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
-import type { ChangeEvent } from "react";
+// import type { ChangeEvent } from "react";
+import { createPost } from "../../lib/api/post";
 
 // 입력데이터 관리
 const AddPhoto = () => {
@@ -13,29 +14,60 @@ const AddPhoto = () => {
   const [day, setDay] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // 제출
-  const handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // 데이터 확인 (콘솔)
-    const formData = {
-      year,
-      month,
-      day,
-      description,
-      // photoFile
-    };
-
-    console.log("=== <form> 데이터 확인 (handleSubmit 실행) ===");
-    console.log(formData);
-
-    navigate("/MissionLog");
+  // 날짜 포맷 변환
+  const formatDate = (): string => {
+    const formattedMonth = month.padStart(2, '0');
+    const formattedDay = day.padStart(2, '0');
+    return `${year}-${formattedMonth}-${formattedDay}`;
   };
 
-  // const AddPhoto = () => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setPhotoFile(e.target.files[0]);
+    }
+  };
+
+// 제출
+  const handleSubmit = async (e: React.FormEvent) => { 
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+// 데이터 확인 (콘솔)
+  try {
+      console.log("=== 전송 데이터 확인 ===");
+      console.log("text:", description);
+      console.log("date:", formatDate());
+      console.log("image:", photoFile);
+
+      const response = await createPost(description, formatDate(), photoFile || undefined);
+
+      console.log("게시물 등록 성공:", response);
+      
+      navigate("/MissionLog");
+  }
+      catch (err) {
+      console.error("게시물 등록 실패:", err);
+      
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response: { data: { message?: string } } };
+        setError(axiosError.response.data.message || '게시물 등록에 실패했습니다.');
+      } else {
+        setError('서버 연결에 실패했습니다.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+// const AddPhoto = () => {
   return (
-    <div className="relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden min-h-screen">
+    <div className="relative mx-auto w-[390px] bg-white min-h-screen">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -92,15 +124,26 @@ const AddPhoto = () => {
           </div>
 
           {/* 사진 */}
-          <div className="mb-8">
-            <div className="text-[#3A290D] font-bold mb-4">
-              사진을 업로드 해주세요
-            </div>
-            <div className="w-[140px] h-[140px] cursor-pointer bg-white rounded-lg flex items-center justify-center text-[#454343] text-sm">
-              사진
-            </div>
-            {/* 실제 파일 업로드 input은 숨겨서 사용 가능 */}
-            {/* <input type="file" onChange={(e) => setPhotoFile(e.target.files[0])} className="hidden" /> */}
+          <div className='mb-8'>
+            <div className='text-[#3A290D] font-bold mb-4'>사진을 업로드 해주세요</div>
+            <label  htmlFor="photo-upload" className='w-[140px] h-[140px] cursor-pointer bg-white rounded-lg flex items-center justify-center text-[#454343] text-sm'>
+               {photoFile ? (
+                <img 
+                  src={URL.createObjectURL(photoFile)} 
+                  alt="미리보기" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                "사진"
+              )}
+            </label>
+             <input 
+              id="photo-upload"
+              type="file" 
+              accept="image/*"
+              onChange={handleFileChange} 
+              className="hidden" 
+            />
           </div>
 
           {/* 설명 */}
@@ -117,13 +160,18 @@ const AddPhoto = () => {
             />
           </div>
 
+{error && (
+  <div className='mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm'>
+    {error}
+  </div>
+)}
           {/* 전송 */}
-          <div className="flex justify-center mt-6">
-            <button
-              type="submit"
-              className="w-[279px] h-[45px] cursor-pointer bg-[#523E1B] text-white text-[14px] font-semibold rounded-full hover:bg-[#403526] transition-colors"
+          <div className='flex justify-center mt-6'>
+            <button 
+              type="submit" disabled={loading}
+              className='w-[279px] h-[45px] cursor-pointer bg-[#523E1B] text-white text-[14px] font-semibold rounded-full hover:bg-[#403526] transition-colors'
             >
-              저장하기
+              {loading ? '저장 중...' : '저장하기'}
             </button>
           </div>
         </div>
