@@ -8,6 +8,9 @@ import {
 } from "react-router-dom";
 // import './App.css';
 
+// ── 컴포넌트
+import { ProtectedRoute } from "./components/ProtectedRoute";
+
 // ── 로그인 및 회원가입 페이지
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
@@ -68,32 +71,87 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 기본 진입은 로그인 화면으로 리다이렉트*/}
+        {/* 기본 진입은 로그인 화면으로 리다이렉트 (비로그인 사용자용) */}
         <Route path="/" element={<Navigate to="/Login" replace />} />
 
-        {/* 로그인 & 회원가입 */}
+        {/* 로그인 & 회원가입 (비보호 라우트) */}
         <Route path="/Login" element={<Login />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/FamilyCode" element={<FamilyCode />} />
         <Route path="/SelectRole" element={<SelectRole />} />
         <Route path="/Knitting" element={<Knitting />} />
         <Route path="/Kindness" element={<Kindness />} />
-        <Route path="/Home" element={<Home />} />
 
-        {/* 질문 관련(feature) */}
-        <Route path={PATHS.questionList} element={<QuestionListPage />} />
-        <Route path={PATHS.createQuestion} element={<CreateQuestionPage />} />
-        <Route path={PATHS.temp} element={<TempPage />} />
-        <Route path={PATHS.answer()} element={<QuestionDetailWrapper />} />
+        {/* 홈 (로그인 필요) */}
+        <Route path="/Home" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
 
-        {/* 미션/포토/답변(develop) */}
-        <Route path={PATHS.mission} element={<MissionPage />} />
-        <Route path={PATHS.todayMission} element={<TodayMissionPage />} />
-        <Route path="/MissionLog" element={<MissionLog />} />
-        <Route path="/MissionDetail/:missionId" element={<MissionDetail />} />
-        <Route path="/PhotoDetail/:postId" element={<PhotoDetail />} />
-        <Route path="/AnswerDetail/:customQId" element={<AnswerDetail />} />
-        <Route path="/AddPhoto" element={<AddPhoto />} />
+        {/* 질문 관련 (로그인 필요) */}
+        <Route path={PATHS.questionList} element={
+          <ProtectedRoute>
+            <QuestionListPage />
+          </ProtectedRoute>
+        } />
+        <Route path={PATHS.createQuestion} element={
+          <ProtectedRoute>
+            <CreateQuestionPage />
+          </ProtectedRoute>
+        } />
+        <Route path={PATHS.temp} element={
+          <ProtectedRoute>
+            <TempPage />
+          </ProtectedRoute>
+        } />
+        <Route path={PATHS.answer()} element={
+          <ProtectedRoute>
+            <QuestionDetailWrapper />
+          </ProtectedRoute>
+        } />
+
+        {/* 미션/포토/답변 (로그인 필요) */}
+        <Route path={PATHS.mission} element={
+          <ProtectedRoute>
+            <MissionPage />
+          </ProtectedRoute>
+        } />
+        <Route path={PATHS.todayMission} element={
+          <ProtectedRoute>
+            <TodayMissionPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/MissionLog" element={
+          <ProtectedRoute>
+            <MissionLog />
+          </ProtectedRoute>
+        } />
+        <Route path="/MissionDetail/:missionId" element={
+          <ProtectedRoute>
+            <MissionDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/PhotoDetail/:postId" element={
+          <ProtectedRoute>
+            <PhotoDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/AnswerDetail/:customQId" element={
+          <ProtectedRoute>
+            <AnswerDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/AddPhoto" element={
+          <ProtectedRoute>
+            <AddPhoto />
+          </ProtectedRoute>
+        } />
+        <Route path={PATHS.TodayKindness} element={
+          <ProtectedRoute>
+            <Kindness />
+          </ProtectedRoute>
+        } />
 
         {/* 404 → 기본 로그인 화면으로 */}
         <Route path="*" element={<Navigate to="/Login" replace />} />

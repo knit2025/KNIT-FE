@@ -158,7 +158,7 @@ export const QuestionListPage = () => {
       {/* + 버튼 (질문 생성) */}
       <button
         type='button'
-        className='fixed left-[317px] bottom-[110px] w-[34px] h-[34px] cursor-pointer z-50'
+        className='absolute left-[317px] bottom-[110px] w-[34px] h-[34px] cursor-pointer z-50'
         onClick={handleCreateQuestion}>
         <img src={PlusIcon} alt="PlusIcon" className='w-full h-full'/>
       </button>

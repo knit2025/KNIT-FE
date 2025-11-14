@@ -60,7 +60,7 @@ export const mapApiToQuestion = (apiData: QuestionCardResponse): Question => {
  * @throws {Error} 인증 실패, 질문 없음, 기타 에러
  */
 export const getQuestionCards = async (): Promise<QuestionCardResponse[]> => {
-  const url = `${API_BASE_URL}/customq/list/`;
+  const url = `${API_BASE_URL}/customqa/list/`;
   const headers = getAuthHeaders();
 
   console.log('API 요청:', url);
@@ -110,7 +110,7 @@ export const createQuestion = async (
   isAnonymous: boolean,
   isPublic: boolean
 ): Promise<CreateQuestionResponse> => {
-  const url = `${API_BASE_URL}/customq/create/`;
+  const url = `${API_BASE_URL}/customqa/create/`;
   const headers = getAuthHeaders();
 
   const requestBody: CreateQuestionRequest = {
@@ -153,7 +153,7 @@ export const createQuestion = async (
  *
  */
 export const createQuestionAnswer = async(customQId: string, content: string) => {
-  const url = `${API_BASE_URL}/customq/${customQId}/answer/`;
+  const url = `${API_BASE_URL}/customqa/${customQId}/answer/`;
   const headers = getAuthHeaders();
 
   console.log('API 요청:', url);
@@ -198,7 +198,7 @@ interface QuestionAnswerResponse {
  * @throws {Error} 인증 실패, 질문 없음, 기타 에러
  */
 export const getQuestionAnswer = async(customQId: string): Promise<QuestionAnswerResponse> => {
-  const url = `${API_BASE_URL}/customq/${customQId}/answers/`;
+  const url = `${API_BASE_URL}/customqa/${customQId}/answers/`;
   const headers = getAuthHeaders();
 
   console.log('답변 조회 API 요청:', url);
