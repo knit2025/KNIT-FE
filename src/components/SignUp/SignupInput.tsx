@@ -1,5 +1,3 @@
-import React from "react";
-
 interface FieldProps {
   fieldName: string;
   type: string;

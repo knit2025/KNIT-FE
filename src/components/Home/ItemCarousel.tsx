@@ -1,4 +1,3 @@
-import React from "react";
 import leftBtn from "../../assets/leftBtn.png";
 import rightBtn from "../../assets/rightBtn.png";
 import Item from "../../components/Home/Item";

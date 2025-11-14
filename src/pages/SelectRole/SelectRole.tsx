@@ -1,4 +1,3 @@
-import React from "react";
 import InputField from "../../components/SelectRole/InputField";
 import RoleCard from "../../components/SelectRole/RoleCard";
 import StartBtn from "../../components/SelectRole/StartBtn";
