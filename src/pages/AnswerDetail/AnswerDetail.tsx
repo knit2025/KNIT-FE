@@ -43,7 +43,7 @@ useEffect(() => {
         userName: a.isAnonymous ? "익명" : a.userName,
       }));
 
-      setAnswers(processedAnswers); // 🔹 반드시 상태에 반영
+      setAnswers(processedAnswers); // 반드시 상태에 반영
     } catch (err) {
       console.error("답변 불러오기 실패:", err);
       setError("답변 불러오기 실패");
