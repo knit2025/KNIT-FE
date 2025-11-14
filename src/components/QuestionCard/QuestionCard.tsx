@@ -9,6 +9,7 @@ interface QuestionCardProps {
   answerValue?: string;
   onChangeAnswer?: (value: string) => void;
   onAnswerClick?: () => void;
+  showAnswerButton?: boolean; // 답변 버튼 표시 여부
 }
 
 export const QuestionCard = ({
@@ -20,6 +21,7 @@ export const QuestionCard = ({
   answerValue,
   onChangeAnswer,
   onAnswerClick,
+  showAnswerButton = true, // 기본값 true
 }: QuestionCardProps) => {
   return (
     <div
@@ -40,7 +42,7 @@ export const QuestionCard = ({
           <h3 className="text-[13px] font-semibold tracking-[0.05em] text-brand">
             {question.targetRole} {question.authorRole}이 궁금한 점
           </h3>
-          {!editable && (
+          {!editable && showAnswerButton && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -59,7 +61,7 @@ export const QuestionCard = ({
           {/* 질문 내용 섹션 */}
           <section className="flex-2 flex flex-col pb-[15px]">
             <p className="text-[11px] text-left font-gabia mb-2 text-brand/70 select-none">질문 내용</p>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 scroll-container">
               <p className="text-[12px] text-left text-brand/80 whitespace-pre-wrap select-none">
                 {question.content || ''}
               </p>
@@ -77,11 +79,11 @@ export const QuestionCard = ({
                 value={answerValue ?? question.answer ?? ''}
                 onChange={(e) => onChangeAnswer?.(e.target.value)}
                 placeholder="여기를 눌러 답변을 입력해주세요!"
-                className="flex-1 w-full text-[12px] text-left text-brand/80 bg-transparent resize-none outline-none overflow-y-auto"
+                className="flex-1 w-full text-[12px] text-left text-brand/80 bg-transparent resize-none outline-none scroll-container"
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <p className="flex-1 text-left text-[12px] text-brand/50 whitespace-pre-wrap overflow-y-auto select-none">
+              <p className="flex-1 text-left text-[12px] text-brand/50 whitespace-pre-wrap scroll-container select-none">
                 {question.answer?.trim() ? question.answer : '아직 답변을 작성되지 않았어요.'}
               </p>
             )}

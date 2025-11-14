@@ -6,7 +6,8 @@ export const PATHS = {
   answer: (id: string | number = ':id') => `/question/${id}/answer`,
   mission: '/mission',
   todayMission: '/mission/today',
-  missionLog: "/mission-log",
+  missionDetail: (id: string | number = ':missionId') => `/MissionDetail/${id}`,
+  missionLog: "/missionLog",
   TodayKindness: "/TodayKindness"
 } as const;
 
