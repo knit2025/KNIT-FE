@@ -23,7 +23,7 @@ const Knitting: React.FC = () => {
   }, [images.length]);
 
   return (
-    <div className="w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFEADB] to-[#FFFFFF]">
+    <div className="mx-auto w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFEADB] to-[#FFFFFF]">
       <p className="font-roundfix text-[#826F5F] text-[1.875rem] pb-10 ">
         {"< knitting >"}
       </p>
