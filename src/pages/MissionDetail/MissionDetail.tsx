@@ -63,54 +63,15 @@
 // export default MissionDetail;
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-// import axios from 'axios';
 import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
-
-interface UserSubmission {
-  userId: number;
-  userName: string;
-  opinion: string;
-  image: string;
-  createdAt: string;
-}
-
-interface MissionDetailData {
-  missionInstanceId: number;
-  title: string;
-  content: string;
-  completedDate: string;
-  userSubmissions: UserSubmission[];
-}
-
-// 🆕 더미 데이터 추가
-const DUMMY_DATA: MissionDetailData = {
-  missionInstanceId: 1,
-  title: "사진찍기",
-  content: "가족과 함께 사진을 찍어봐요",
-  completedDate: "2025-11-12",
-  userSubmissions: [
-    {
-      userId: 4,
-      userName: "이연우",
-      opinion: "재밌었어요",
-      image: "/media/missions/가나디.png",
-      createdAt: "2025-11-12T00:27:20.989261",
-    },
-    {
-      userId: 5,
-      userName: "엄마",
-      opinion: "우리 가족과 함께해서 좋았어요. 다음에 또 하고 싶어요!",
-      image: "/media/missions/family2.png",
-      createdAt: "2025-11-12T01:30:00.000000",
-    },
-  ],
-};
+import { getMissionDetail, type MissionDetailResponse } from "../../api/missions";
+import { API_BASE_URL } from "../../api/config";
 
 const MissionDetail = () => {
   const { missionId } = useParams<{ missionId: string }>();
-  const [missionData, setMissionData] = useState<MissionDetailData | null>(null);
+  const [missionData, setMissionData] = useState<MissionDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -123,26 +84,12 @@ const MissionDetail = () => {
       }
 
       try {
-        // 🔧 일단 더미 데이터 사용 (API 호출 주석 처리)
-        console.log('더미 데이터 사용 중...');
-        await new Promise(resolve => setTimeout(resolve, 500)); // 로딩 시뮬레이션
-        setMissionData(DUMMY_DATA);
-        
-        /* 
-        // 실제 API 호출 (나중에 주석 해제)
-        const response = await axios.get(`/missions`, {
-          params: { missionId },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        });
-        
-        console.log('Mission data:', response.data);
-        setMissionData(response.data);
-        */
-      } catch (error) {
-        console.error('Error fetching mission detail:', error);
-        setError('미션을 불러오는데 실패했습니다.');
+        setLoading(true);
+        const data = await getMissionDetail(Number(missionId));
+        setMissionData(data);
+      } catch (err) {
+        console.error('미션 상세 조회 실패:', err);
+        setError(err instanceof Error ? err.message : '미션을 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
@@ -189,9 +136,16 @@ const MissionDetail = () => {
             >
               {submission.image ? (
                 <img
-                  src={submission.image}
+                  src={submission.image.startsWith('http') ? submission.image : `${API_BASE_URL}${submission.image}`}
                   alt={`${submission.userName}의 미션`}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // 이미지 로드 실패 시 기본 텍스트 표시
+                    e.currentTarget.style.display = 'none';
+                    if (e.currentTarget.parentElement) {
+                      e.currentTarget.parentElement.innerHTML = '<div class="w-full h-full flex justify-center items-center text-black">사진</div>';
+                    }
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex justify-center items-center text-black">

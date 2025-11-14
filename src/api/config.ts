@@ -1,5 +1,5 @@
 // 개발 환경에서는 프록시를 통해 CORS 우회
-export const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_BASE_URL;
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('accessToken');
