@@ -11,7 +11,7 @@ interface QuestionCardResponse {
 }
 
 interface CreateQuestionRequest {
-  toUser: string;
+  toUser: number | null;
   text: string;
   isAnonymous: boolean;
   isPublic: boolean;
@@ -93,7 +93,7 @@ export const getQuestionCards = async (): Promise<QuestionCardResponse[]> => {
 /**
  * 새로운 질문 카드 생성
  *
- * @param {string} toUser - 질문 대상 역할 (예: "엄마", "아빠", "딸", "아들", "모두")
+ * @param {number | null} toUser - 질문 대상 사용자 ID (예: 123, 456) 또는 null (모두에게)
  * @param {string} text - 질문 내용
  * @param {boolean} isAnonymous - 익명 여부
  * @param {boolean} isPublic - 공개 여부
@@ -101,11 +101,14 @@ export const getQuestionCards = async (): Promise<QuestionCardResponse[]> => {
  * @throws {Error} 인증 실패, 유효성 검증 실패, 기타 에러
  *
  * @example
- * const result = await createQuestion("딸", "오늘 기분 어땠어?", true, true);
+ * const result = await createQuestion(123, "오늘 기분 어땠어?", true, true);
  * console.log(result.customQId); // 10
+ *
+ * @example
+ * const result = await createQuestion(null, "가족 모두에게 질문", false, true);
  */
 export const createQuestion = async (
-  toUser: string,
+  toUser: number | null,
   text: string,
   isAnonymous: boolean,
   isPublic: boolean

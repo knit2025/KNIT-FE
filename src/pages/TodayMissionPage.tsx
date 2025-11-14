@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
-import { getTodayMission, submitMission } from "../api/missions";
+import { getTodayMission, submitMission, checkCurrentUserSubmitted } from "../api/missions";
 import { PATHS } from "../routes";
-import { setMissionCompleted, isMissionCompletedToday } from "../utils/missionStorage";
 import type { ChangeEvent } from "react";
+import Toast from "../components/Toast/Toast";
 
 export const TodayMissionPage = () => {
   const navigate = useNavigate();
@@ -16,27 +16,26 @@ export const TodayMissionPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
 
   useEffect(() => {
     const fetchTodayMission = async () => {
       try {
         setLoading(true);
 
-        // 로컬 스토리지에서 오늘 미션 완료 여부 확인
-        if (isMissionCompletedToday()) {
-          alert('이미 오늘의 미션을 완료했습니다');
-          navigate(PATHS.mission);
-          return;
-        }
-
         const mission = await getTodayMission();
         setMissionInstanceId(mission.missionInstanceId);
         setMissionTitle(mission.content);
 
-        // 이미 완료된 미션이면 미션 페이지로 리다이렉트
-        if (mission.isCompleted) {
-          alert('이미 완료한 미션입니다');
-          navigate(PATHS.mission);
+        // 서버 응답의 userSubmissions에서 이미 제출했는지 확인
+        // userName === loginId && isSubmitted === true
+        if (checkCurrentUserSubmitted(mission.userSubmissions)) {
+          setToastMsg('이미 제출한 미션입니다');
+          setToastOpen(true);
+          // 토스트 표시 후 미션 목록으로 이동
+          setTimeout(() => navigate(PATHS.mission), 1200);
+          return;
         }
       } catch (err) {
         console.error('미션 불러오기 실패:', err);
@@ -63,18 +62,15 @@ export const TodayMissionPage = () => {
 
     try {
       setSubmitting(true);
-      const result = await submitMission(missionInstanceId, comment, photo);
+      await submitMission(missionInstanceId, comment, photo);
 
-      if (result.isCompleted) {
-        // 로컬 스토리지에 미션 완료 상태 저장 (자정에 자동 초기화됨)
-        setMissionCompleted();
-
-        alert('미션이 성공적으로 제출되었습니다!');
-        navigate(PATHS.mission);
-      }
+      setToastMsg('미션이 성공적으로 제출되었습니다!');
+      setToastOpen(true);
+      setTimeout(() => navigate(PATHS.mission), 1200);
     } catch (err) {
       console.error('미션 제출 실패:', err);
-      alert(err instanceof Error ? err.message : '미션 제출에 실패했습니다');
+      setToastMsg(err instanceof Error ? err.message : '미션 제출에 실패했습니다');
+      setToastOpen(true);
     } finally {
       setSubmitting(false);
     }
@@ -99,6 +95,7 @@ export const TodayMissionPage = () => {
   return (
     <div className="relative w-[390px] min-h-screen mx-auto bg-white overflow-hidden text-left">
       <Header />
+      <Toast open={toastOpen} message={toastMsg} onClose={() => setToastOpen(false)} />
 
       {/* 메인 카드 */}
       <div className="absolute top-[126px] left-[24px] w-[342px] h-[493px] bg-[#FEF1E8] rounded-[25px] px-[29px] py-[32px]">

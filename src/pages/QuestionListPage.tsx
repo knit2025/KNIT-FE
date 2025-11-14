@@ -38,11 +38,19 @@ export const QuestionListPage = () => {
   };
 
   // API에서 질문 목록 불러오기
+  // 서버는 비공개(isPublic=false) 질문을 자동으로 필터링하여 반환합니다
+  // - 작성자 또는 대상인 경우에만 비공개 질문이 포함됨
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
         const data = await getQuestionCards();
+
+        // 404: 질문이 없는 경우 빈 배열로 처리
+        if (!data || data.length === 0) {
+          setAllQuestions([]);
+          return;
+        }
 
         // API 데이터를 Question 타입으로 변환하고 답변 가져오기
         const questionsWithAnswers = await Promise.all(
@@ -66,7 +74,14 @@ export const QuestionListPage = () => {
 
         setAllQuestions(questionsWithAnswers);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다');
+        console.error('질문 목록 조회 실패:', err);
+        // 404 에러는 질문이 없는 것으로 처리
+        if (err instanceof Error && err.message.includes('404')) {
+          setAllQuestions([]);
+          setError(null);
+        } else {
+          setError(err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다');
+        }
       } finally {
         setLoading(false);
       }
@@ -135,13 +150,11 @@ export const QuestionListPage = () => {
           <div className="flex items-center justify-center h-full">
             <p className="text-[#A9927F]">질문을 불러오는 중...</p>
           </div>
-        ) :
-        // error ? (
-        //   <div className="flex items-center justify-center h-full">
-        //     <p className="text-red-400">{error}</p>
-        //   </div>
-        // ) :
-        sortedQuestions.length > 0 ? (
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-red-400">{error}</p>
+          </div>
+        ) : sortedQuestions.length > 0 ? (
           <QuestionCardStack
             questions={sortedQuestions}
             onCardSelect={handleAnswerClick}

@@ -30,7 +30,7 @@ const Login: React.FC = () => {
         loginId,
         password,
       });
-      const { access, loginId: returnedId } = response.data;
+      const { access, loginId: returnedId } = response.data || {};
 
       if (!access) {
         throw new Error("access 토큰이 없습니다.");
@@ -39,6 +39,27 @@ const Login: React.FC = () => {
       if (returnedId) {
         localStorage.setItem("loginId", returnedId);
       }
+
+      // 백엔드가 사용자 정보를 함께 반환하는 경우 저장 (선택적, 안전하게 처리)
+      // 예: { user: { id, name, nickname, role, birth } } 또는 { role: "아들" }
+      try {
+        const user = (response.data && (response.data.user || response.data.profile)) || null;
+        const role = (response.data && (response.data.role || (user && user.role))) || null;
+        if (user) {
+          // 필요한 필드만 저장
+          const compact = {
+            id: user.id,
+            name: user.name,
+            nickname: user.nickname,
+            role: user.role,
+            birth: user.birth,
+          };
+          localStorage.setItem("user", JSON.stringify(compact));
+        }
+        if (role) {
+          localStorage.setItem("user_role", String(role));
+        }
+      } catch { /* noop: 응답 포맷이 달라도 앱은 동작 */ }
 
       setLoginId("");
       setPassword("");
