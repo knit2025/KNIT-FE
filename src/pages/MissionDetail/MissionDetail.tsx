@@ -61,9 +61,9 @@
 // };
 
 // export default MissionDetail;
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+// import axios from 'axios';
 import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
@@ -96,38 +96,40 @@ const DUMMY_DATA: MissionDetailData = {
       userName: "이연우",
       opinion: "재밌었어요",
       image: "/media/missions/가나디.png",
-      createdAt: "2025-11-12T00:27:20.989261"
+      createdAt: "2025-11-12T00:27:20.989261",
     },
     {
       userId: 5,
       userName: "엄마",
       opinion: "우리 가족과 함께해서 좋았어요. 다음에 또 하고 싶어요!",
       image: "/media/missions/family2.png",
-      createdAt: "2025-11-12T01:30:00.000000"
-    }
-  ]
+      createdAt: "2025-11-12T01:30:00.000000",
+    },
+  ],
 };
 
 const MissionDetail = () => {
   const { missionId } = useParams<{ missionId: string }>();
-  const [missionData, setMissionData] = useState<MissionDetailData | null>(null);
+  const [missionData, setMissionData] = useState<MissionDetailData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMissionDetail = async () => {
       if (!missionId) {
-        setError('미션 ID가 없습니다.');
+        setError("미션 ID가 없습니다.");
         setLoading(false);
         return;
       }
 
       try {
         // 🔧 일단 더미 데이터 사용 (API 호출 주석 처리)
-        console.log('더미 데이터 사용 중...');
-        await new Promise(resolve => setTimeout(resolve, 500)); // 로딩 시뮬레이션
+        console.log("더미 데이터 사용 중...");
+        await new Promise((resolve) => setTimeout(resolve, 500)); // 로딩 시뮬레이션
         setMissionData(DUMMY_DATA);
-        
+
         /* 
         // 실제 API 호출 (나중에 주석 해제)
         const response = await axios.get(`/missions`, {
@@ -141,8 +143,8 @@ const MissionDetail = () => {
         setMissionData(response.data);
         */
       } catch (error) {
-        console.error('Error fetching mission detail:', error);
-        setError('미션을 불러오는데 실패했습니다.');
+        console.error("Error fetching mission detail:", error);
+        setError("미션을 불러오는데 실패했습니다.");
       } finally {
         setLoading(false);
       }
@@ -162,7 +164,9 @@ const MissionDetail = () => {
   if (error || !missionData) {
     return (
       <div className="min-h-screen relative mx-auto h-[844px] w-[390px] bg-white overflow-hidden flex flex-col items-center justify-center">
-        <div className="text-[#3A290D]">{error || '미션을 찾을 수 없습니다.'}</div>
+        <div className="text-[#3A290D]">
+          {error || "미션을 찾을 수 없습니다."}
+        </div>
       </div>
     );
   }
@@ -181,9 +185,12 @@ const MissionDetail = () => {
       <div className="gap-2 flex pr-[23px] pl-[23px] mb-[30px]">
         {missionData.userSubmissions.length > 0 ? (
           missionData.userSubmissions.slice(0, 2).map((submission, index) => (
-            <div key={index} className="bg-[#E7E7E7] w-[128px] h-[126px] rounded-2xl overflow-hidden">
+            <div
+              key={index}
+              className="bg-[#E7E7E7] w-[128px] h-[126px] rounded-2xl overflow-hidden"
+            >
               {submission.image ? (
-                <img 
+                <img
                   src={submission.image}
                   alt={`${submission.userName}의 미션`}
                   className="w-full h-full object-cover"
@@ -211,12 +218,12 @@ const MissionDetail = () => {
         <div className="text-[#3A290D] font-bold pt-[28px] ml-[23px] mr-[23px]">
           {missionData.title}
         </div>
-        
+
         <div className="ml-[23px] mr-[23px]">
           <div className="mt-[30px] font-bold text-[#3A290D] text-[14px]">
             미션 후 소감
           </div>
-          
+
           {missionData.userSubmissions.length > 0 ? (
             missionData.userSubmissions.map((submission, index) => (
               <div key={index}>
