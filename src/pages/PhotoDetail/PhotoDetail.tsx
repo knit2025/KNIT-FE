@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
@@ -71,22 +71,25 @@ const PhotoDetail = () => {
 
   return (
 
-    <div className='min-h-screen relative mx-auto w-[390px] bg-white'>
+    <div className='overflow-y-auto pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen'>
       <img src={KNITLG} alt="KNITLG" className='pt-[43px] pl-[33px] w-[100px]'/>
       <div className='pl-[23px] text-left ml-2 mt-5 mb-[36px] text-[18px] font-semibold text-[#3A290D]'>우리가족의 소중한 추억</div>
         <div className='pr-[23px] pl-[23px] mb-7'>
-          <div className='w-[342px] h-[337px] bg-[#E7E7E7] rounded-2xl text-black flex justify-center items-center overflow-hidden'>         {post.image ? (
-            <img 
-              src={`https://junhong.shop${post.image}`}
-              alt="게시물 사진"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-[#A9927F]">사진 없음</span>
-          )}
+          <div className='w-[342px] h-[337px] bg-[#E7E7E7] rounded-2xl text-black flex justify-center items-center overflow-hidden'>         
+      {post?.image ? (
+        <img 
+          src={`${import.meta.env.VITE_API_BASE_URL}${post.image}`}
+          alt="post detail"
+          onError={(e) => {
+            console.error('이미지 로드 실패:', post.image);
+          }}
+        />
+      ) : (
+        <div>이미지 없음</div>
+      )}
         </div>
       </div>
-      <div className="h-full rounded-t-[35px] text-left bg-[#F2E7DF]">
+      <div className="pb-[80px] rounded-t-[35px] text-left bg-[#F2E7DF]">
         <div className="flex justify-center pt-[15px]">
           <div className="bg-[#DEB99F] w-[39px] h-[6px] rounded-2xl"></div>
         </div>

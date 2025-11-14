@@ -42,7 +42,7 @@ const Login: React.FC = () => {
 
       setLoginId("");
       setPassword("");
-      navigate("/home");
+      navigate("/Home");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
@@ -58,11 +58,11 @@ const Login: React.FC = () => {
   };
 
   const goToSignUp = () => {
-    navigate("/signup");
+    navigate("/SignUp");
   };
 
   return (
-    <div className="w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFFFFF] to-[#DBBBA4]">
+    <div className="relative mx-auto w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFFFFF] to-[#DBBBA4]">
       <div className="flex flex-col items-center text-center mt-20 mb-10 space-y-1">
         <p className="text-[#3A290D] text-base font-sans font-bold">
           가족 사이의 마음과 마음을 잇는

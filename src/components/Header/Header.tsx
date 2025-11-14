@@ -28,7 +28,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <div
-      className={`relative font-roundfix text-[#826F5F] ${textSize} ${topLoc} ${leftLoc} ${className}`}
+      className={`relative z-50 font-roundfix text-[#826F5F] ${textSize} ${topLoc} ${leftLoc} ${className}`}
     >
       Knit
     </div>

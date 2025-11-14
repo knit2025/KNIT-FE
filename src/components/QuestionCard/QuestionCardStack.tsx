@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Question } from '../../types/question';
 import { QuestionCard } from './QuestionCard';
 import { useSwipe } from '../../hooks/useSwipe';
@@ -6,14 +6,61 @@ import { useSwipe } from '../../hooks/useSwipe';
 interface QuestionCardStackProps {
   questions: Question[];
   onCardSelect: (question: Question) => void;
+  canAnswerQuestion?: (question: Question) => boolean; // 답변 가능 여부 확인 함수
 }
 
 export const QuestionCardStack = ({
   questions,
-  onCardSelect
+  onCardSelect,
+  canAnswerQuestion
 }: QuestionCardStackProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [focusedId, setFocusedId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isScrollingRef = useRef(false);
+
+  // 스크롤 이벤트 핸들러
+  const handleWheel = useCallback((e: WheelEvent) => {
+    e.preventDefault();
+
+    // 스크롤 중복 방지 (디바운싱)
+    if (isScrollingRef.current) return;
+
+    const deltaY = e.deltaY;
+
+    // 스크롤 방향에 따라 카드 이동
+    if (deltaY > 0) {
+      // 아래로 스크롤 → 다음 카드
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+        isScrollingRef.current = true;
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 300); // 300ms 디바운스
+      }
+    } else if (deltaY < 0) {
+      // 위로 스크롤 → 이전 카드
+      if (currentIndex > 0) {
+        setCurrentIndex(prev => prev - 1);
+        isScrollingRef.current = true;
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 300);
+      }
+    }
+  }, [currentIndex, questions.length]);
+
+  // wheel 이벤트 리스너 등록
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [handleWheel]);
 
   const swipeHandlers = useSwipe({
     onSwipeUp: () => {
@@ -30,6 +77,7 @@ export const QuestionCardStack = ({
 
   return (
     <div
+      ref={containerRef}
       className="relative w-full h-full overflow-visible"
       {...swipeHandlers}
     >
@@ -65,6 +113,7 @@ export const QuestionCardStack = ({
               question={question}
               onClick={() => (focusedId === question.id ? onCardSelect(question) : setFocusedId(question.id))}
               onAnswerClick={() => onCardSelect(question)}
+              showAnswerButton={canAnswerQuestion ? canAnswerQuestion(question) : true}
               style={{
                 position: 'absolute',
                 top: 0,

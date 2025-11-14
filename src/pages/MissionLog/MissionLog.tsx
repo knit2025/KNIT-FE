@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // import React from 'react';
 import DotIcon from "../../assets/Ellipse 12.svg";
 import PlusIcon from "../../assets/add 2.png";
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 //정의
 import { getMemoryData } from "../../lib/api/memory";
+// import { API_BASE_URL } from '../../config';
 
 //호출
 interface Post {
@@ -52,7 +53,7 @@ const MissionLog = () => {
 
   const navigate = useNavigate();
   const [data, setData] = useState<MemoryData | null>(null);
-
+  const [loading, setLoading] = useState(true);
 
   const handleClick = () => {
     navigate("/AddPhoto");
@@ -67,17 +68,36 @@ const AnsClick = (missionId: number) => {
 const MisstonClick = (missionId: number) => {
   navigate(`/MissionDetail/${missionId}`);
 };
-useEffect(() => {
-  getMemoryData()
-    .then(res => {
-      console.log("Memory 데이터:", res); // ← 여기에 있어야 콘솔에 뜸
-      setData(res)
-    })
-    .catch((err) => console.error("데이터 불러오기 실패:", err));
-}, []);
+
+ // 데이터 로딩 함수 분리
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await getMemoryData();
+      console.log("Memory 데이터:", res);
+      setData(res);
+    } catch (err) {
+      console.error("데이터 불러오기 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+// useEffect(() => {
+//   getMemoryData()
+//     .then(res => {
+//       console.log("Memory 데이터:", res); // ← 여기에 있어야 콘솔에 뜸
+//       setData(res)
+//     })
+//     .catch((err) => console.error("데이터 불러오기 실패:", err));
+// }, []);
 
   return (
-    <div className="min-h-screen relative mx-auto w-[390px] bg-white ">
+    <div className="overflow-y-auto pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -118,22 +138,37 @@ useEffect(() => {
       gridAutoFlow: 'row dense' // 빈 공간 채우기
     }}
   >
-    {/* 카드 그리드 시작 */}
-    {/* 큰 카드 */}
-    {data?.posts.map((p) => (
-    <div key={p.postId} className="col-span-3 h-[120px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={() => MPhotoClick(p.postId)}>
-      <div className="flex items-center h-full p-3">
-        <div className="bg-white rounded-2xl w-[150px] text-black h-[98px] flex items-center justify-center mr-3">{p.image ? <img src={p.image} alt="post" className="w-full h-full object-cover rounded-2xl" /> : "사진"}</div>
-        <div className="flex flex-col items-start justify-start text-left">
-          <div className="font-semibold text-[13px] text-[#3A290D]">{p.date}</div>
-          <div className="font-gabia text-[#454343] text-[12px]">{p.text}</div>
-        </div>
+{data?.posts.map((p) => (
+  <div 
+    key={p.postId} 
+    className="col-span-3 h-[120px] rounded-2xl bg-[#F2E7DF] cursor-pointer" 
+    onClick={() => MPhotoClick(p.postId)}
+  >
+    <div className="flex items-center h-full p-3">
+      <div className="bg-white rounded-2xl w-[150px] text-black h-[98px] flex items-center justify-center mr-3 overflow-hidden">
+        {p.image ? (
+          <img 
+            src={`${import.meta.env.VITE_API_BASE_URL}${p.image}`}
+            alt="post" 
+            className="w-full h-full object-cover rounded-2xl"
+            onError={(e) => {
+              console.error('이미지 로드 실패:', p.image);
+            }}
+          />
+        ) : (
+          <div className="text-gray-400">사진</div>
+        )}
+      </div>
+      <div className="flex flex-col items-start justify-start text-left">
+        <div className="font-semibold text-[13px] text-[#3A290D]">{p.date}</div>
+        <div className="font-gabia text-[#454343] text-[12px]">{p.text}</div>
       </div>
     </div>
-    ))}
+  </div>
+))}
 
     {/* 중간 카드 */}
-    {data?.missions.slice(0, 1).map((m) => ( 
+    {/* {data?.missions.slice(0, 1).map((m) => ( 
     <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer" onClick={() => MisstonClick(m.missionId)}>
       <div className="flex items-center h-full p-3">
         <div className="bg-white rounded-2xl  text-black w-[110px] h-[75px] flex items-center justify-center mr-3">{m.image ? <img src={m.image} alt="post" className="w-full h-full object-cover rounded-2xl" /> : "사진"}</div>
@@ -143,7 +178,33 @@ useEffect(() => {
         </div>
       </div>
     </div>
-    ))}
+    ))} */}
+    
+    {/* 중간 카드 */}
+{data?.missions.slice(0, 1).map((m) => ( 
+  <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer" onClick={() => MisstonClick(m.missionId)}>
+    <div className="flex items-center h-full p-3">
+      <div className="bg-white rounded-2xl text-black w-[110px] h-[75px] flex items-center justify-center mr-3 overflow-hidden">
+        {m.image ? (
+          <img 
+            src={`${import.meta.env.VITE_API_BASE_URL}${m.image}`}
+            alt="mission" 
+            className="w-full h-full object-cover rounded-2xl"
+            onError={(e) => {
+              console.error('이미지 로드 실패:', m.image);
+            }}
+          />
+        ) : (
+          <div className="text-gray-400">사진</div>
+        )}
+      </div>
+      <div className="flex flex-col items-start justify-start text-left">
+        <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+        <div className="font-gabia text-[#454343] text-[12px]">{m.text}</div>
+      </div>
+    </div>
+  </div>
+))}
 
     {/* 작은 카드 */}
     {data?.missions.slice(1).map((m) => (
@@ -157,32 +218,6 @@ useEffect(() => {
     </div>
     ))}
 
-{/* 임시 박스 */}
-    {/* <div className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={AnsClick}>
-      <div className="flex items-center h-full p-3">
-        <div className="flex flex-col items-start justify-start text-left">
-          <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-          <div className="font-gabia  text-[#454343] text-[11px]">우리의 답</div>
-        </div>
-      </div>
-    </div>
-        <div className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={AnsClick}>
-      <div className="flex items-center h-full p-3">
-        <div className="flex flex-col items-start justify-start text-left">
-          <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-          <div className="font-gabia  text-[#454343] text-[11px]">우리의 답</div>
-        </div>
-      </div>
-    </div>
-        <div className="col-span-1 h-[98px] rounded-2xl bg-[#F2E7DF] cursor-pointer" onClick={AnsClick}>
-      <div className="flex items-center h-full p-3">
-        <div className="flex flex-col items-start justify-start text-left">
-          <span className="text-[13px] text-[#3A290D]">그날의 질문</span>
-          <div className="font-gabia  text-[#454343] text-[11px]">우리의 답</div>
-        </div>
-      </div>
-    </div> */}
-    {/* ... */}
   </div>
 </div>
       <button

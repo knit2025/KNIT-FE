@@ -45,7 +45,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <div className="w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFFFFF] to-[#DBBBA4]">
+      <div className="relative mx-auto w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFFFFF] to-[#DBBBA4]">
         <div className="flex flex-col items-start w-full">
           <Header
             className="text-left pl-8 w-full"
