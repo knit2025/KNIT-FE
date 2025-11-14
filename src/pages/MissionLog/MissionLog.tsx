@@ -167,34 +167,20 @@ const MisstonClick = (missionInstanceId: number) => {
   <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer"  onClick={() => MisstonClick(m.missionInstanceId)} >
     <div className="flex items-center h-full p-3">
       <div className="bg-white rounded-2xl text-black w-[110px] h-[75px] flex items-center justify-center mr-3 overflow-hidden">
-        {/* {m.image ? (
-          <img 
-            src={`${import.meta.env.VITE_API_BASE_URL}${m.image}`}
-            alt="mission" 
-            className="w-full h-full object-cover rounded-2xl"
-            onError={(e) => {
-              console.error('이미지 로드 실패:', m.image);
-            }}
-          />
-        ) : (
-          <div className="text-gray-400">사진</div>
-        )} */}
-        {m.image ? (() => {
-  const imageUrl = m.image.startsWith('/')
-    ? `${import.meta.env.VITE_API_BASE_URL}${m.image}`
-    : `${import.meta.env.VITE_API_BASE_URL}/${m.image}`;
-
-  return (
+ {m.image ? (
     <img
-      src={imageUrl}
+      src={
+        m.image.startsWith('/')
+          ? `${import.meta.env.VITE_API_BASE_URL}${m.image}`
+          : `${import.meta.env.VITE_API_BASE_URL}/${m.image}`
+      }
       alt="mission"
       className="w-full h-full object-cover rounded-2xl"
       onError={() => console.error("이미지 로드 실패:", m.image)}
     />
-  );
-})() : (
-  <div className="text-gray-400">사진</div>
-)}
+  ) : (
+    <div className="text-gray-400">사진</div>
+  )}
       </div>
       <div className="flex flex-col items-start justify-start text-left">
         <span className="text-[13px] text-[#3A290D]">{m.title}</span>
@@ -205,16 +191,6 @@ const MisstonClick = (missionInstanceId: number) => {
 ))}
 
     {/* 작은 카드 */}
-    {/* {data?.missions.slice(1).map((m) => (
-    <div key={m.missionId} className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer" onClick={() => AnsClick(m.missionId)}>
-      <div className="flex items-center h-full p-3">
-        <div className="flex flex-col items-start justify-start text-left">
-          <span className="text-[13px] text-[#3A290D]">{m.title}</span>
-          <div className="font-gabia text-[#454343] text-[11px]">{m.text}</div>
-        </div>
-      </div>
-    </div>
-    ))} */}
     {data?.missions.slice(1).map((m) => (
   <div 
     key={m.missionId} 
