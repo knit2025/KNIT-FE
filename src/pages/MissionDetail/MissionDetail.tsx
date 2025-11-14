@@ -110,26 +110,24 @@ const DUMMY_DATA: MissionDetailData = {
 
 const MissionDetail = () => {
   const { missionId } = useParams<{ missionId: string }>();
-  const [missionData, setMissionData] = useState<MissionDetailData | null>(
-    null
-  );
+  const [missionData, setMissionData] = useState<MissionDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMissionDetail = async () => {
       if (!missionId) {
-        setError("미션 ID가 없습니다.");
+        setError('미션 ID가 없습니다.');
         setLoading(false);
         return;
       }
 
       try {
         // 🔧 일단 더미 데이터 사용 (API 호출 주석 처리)
-        console.log("더미 데이터 사용 중...");
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 로딩 시뮬레이션
+        console.log('더미 데이터 사용 중...');
+        await new Promise(resolve => setTimeout(resolve, 500)); // 로딩 시뮬레이션
         setMissionData(DUMMY_DATA);
-
+        
         /* 
         // 실제 API 호출 (나중에 주석 해제)
         const response = await axios.get(`/missions`, {
@@ -143,8 +141,8 @@ const MissionDetail = () => {
         setMissionData(response.data);
         */
       } catch (error) {
-        console.error("Error fetching mission detail:", error);
-        setError("미션을 불러오는데 실패했습니다.");
+        console.error('Error fetching mission detail:', error);
+        setError('미션을 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
@@ -218,12 +216,12 @@ const MissionDetail = () => {
         <div className="text-[#3A290D] font-bold pt-[28px] ml-[23px] mr-[23px]">
           {missionData.title}
         </div>
-
+        
         <div className="ml-[23px] mr-[23px]">
           <div className="mt-[30px] font-bold text-[#3A290D] text-[14px]">
             미션 후 소감
           </div>
-
+          
           {missionData.userSubmissions.length > 0 ? (
             missionData.userSubmissions.map((submission, index) => (
               <div key={index}>

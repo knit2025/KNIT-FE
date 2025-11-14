@@ -13,9 +13,11 @@ interface Answer {
 }
 
 const AnswerDetail = () => {
+  const navigate = useNavigate();
   const { customQId } = useParams<{ customQId: string }>();
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchAnswers = async () => {
