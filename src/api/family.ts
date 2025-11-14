@@ -6,6 +6,7 @@ export interface FamilyMember {
   nickname: string;
   role: string;
   birth: string;
+  loginId?: string; // 사용자의 로그인 ID
 }
 
 export interface FamilyResponse {

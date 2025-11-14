@@ -8,6 +8,7 @@ import { PATHS } from '../routes';
 import Footer from '../components/Footer/Footer';
 import { getQuestionCards, mapApiToQuestion, getQuestionAnswer } from '../api/questions';
 import { getCurrentUserRole } from '../api/config';
+import { useMemo } from 'react';
 
 
 export const QuestionListPage = () => {
@@ -19,22 +20,18 @@ export const QuestionListPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortByAnswerable, setSortByAnswerable] = useState(false); // 답변 가능한 질문 정렬 상태
 
-  // 현재 사용자가 답변할 수 있는 질문인지 확인하는 함수
+  const currentUserId = useMemo(() => {
+    const v = localStorage.getItem('currentUserId');
+    return v ? Number(v) : undefined;
+  }, []);
+
+  // 현재 사용자가 답변할 수 있는 질문인지 확인 (ID 기준)
   const canAnswerQuestion = (question: Question): boolean => {
-    const currentUserRole = getCurrentUserRole();
-    if (!currentUserRole) return false;
-
-    // 이미 답변된 질문은 답변 불가
-    if (question.answer) return false;
-
-    // targetRole에서 "에게" 제거하여 비교 (예: "엄마에게" -> "엄마")
-    const targetRole = question.targetRole.replace('에게', '');
-
-    // "모두에게"인 경우 모두 답변 가능
-    if (question.targetRole === '모두에게') return true;
-
-    // 현재 사용자의 역할이 질문의 대상과 일치하는 경우에만 답변 가능
-    return currentUserRole === targetRole;
+    if (question.answer) return false; // 이미 답변됨
+    if (currentUserId == null) return false;
+    if (question.fromUserId != null && question.fromUserId === currentUserId) return false; // 작성자는 불가
+    if (question.toUserId == null) return true; // 모두에게
+    return question.toUserId === currentUserId; // 대상자가 현재 사용자
   };
 
   // API에서 질문 목록 불러오기
@@ -93,11 +90,10 @@ export const QuestionListPage = () => {
   // 답변 가능한 질문을 상단으로 정렬
   const sortedQuestions = sortByAnswerable
     ? [...allQuestions].sort((a, b) => {
-        const aCanAnswer = canAnswerQuestion(a);
-        const bCanAnswer = canAnswerQuestion(b);
-        if (aCanAnswer && !bCanAnswer) return -1;
-        if (!aCanAnswer && bCanAnswer) return 1;
-        return 0;
+        // 아직 답변 안했고(toUserId == currentUserId) 우선
+        const aScore = (a.answer ? 0 : 1) + (a.toUserId === currentUserId ? 2 : 0);
+        const bScore = (b.answer ? 0 : 1) + (b.toUserId === currentUserId ? 2 : 0);
+        return bScore - aScore;
       })
     : allQuestions;
 
@@ -144,7 +140,7 @@ export const QuestionListPage = () => {
 
       {/* 카드 스택 영역: 스택 자체는 스와이프/휠로만 이동 (스크롤 X) */}
       <div
-        className="absolute top-[191px] left-[25px] w-[340px] h-[443px] overflow-hidden"
+        className="absolute top-[191px] left-[25px] w-[340px] h-[570px] overflow-hidden"
       >
         {loading ? (
           <div className="flex items-center justify-center h-full">

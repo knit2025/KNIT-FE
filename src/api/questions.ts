@@ -3,8 +3,11 @@ import type { Question, FamilyRole, QuestionTarget } from '../types/question';
 
 interface QuestionCardResponse {
   customQId: number;
-  fromUser: string;
-  toUser: string;
+  // 새 API 대응: ID 우선, 문자열은 하위 호환
+  fromUserId?: number;
+  toUserId?: number | null;
+  fromUser?: string; // ex) "딸"
+  toUser?: string;   // ex) "엄마" or "모두"
   text: string;
   isAnswered: boolean;
   isPublic: boolean;
@@ -30,26 +33,36 @@ interface CreateQuestionResponse {
  * @returns {Question} 변환된 Question 객체
  */
 export const mapApiToQuestion = (apiData: QuestionCardResponse): Question => {
-  // fromUser를 FamilyRole로 매핑 (익명은 기타로 처리)
-  const authorRole: FamilyRole = apiData.fromUser === '익명'
-    ? '기타'
-    : (apiData.fromUser as FamilyRole);
+  // 로컬에 저장된 id→role 매핑을 우선 사용
+  let roleMap: Record<number, string> = {};
+  try {
+    const raw = localStorage.getItem('userRoleMap');
+    if (raw) roleMap = JSON.parse(raw);
+  } catch {}
 
-  // toUser를 QuestionTarget으로 변환 (예: "엄마" → "엄마에게")
-  const targetRole: QuestionTarget = apiData.toUser === '모두'
-    ? '모두에게'
-    : `${apiData.toUser}에게` as QuestionTarget;
+  const authorRoleName =
+    (apiData.fromUserId != null ? roleMap[apiData.fromUserId] : undefined) || apiData.fromUser || '기타';
+  const toRoleName =
+    (apiData.toUserId != null ? roleMap[apiData.toUserId] : undefined) || apiData.toUser || '모두';
+
+  const authorRole: FamilyRole = authorRoleName as FamilyRole;
+  const targetRole: QuestionTarget =
+    apiData.toUserId === null || toRoleName === '모두'
+      ? '모두에게'
+      : (`${toRoleName}에게` as QuestionTarget);
 
   return {
     id: apiData.customQId.toString(),
-    authorRole: authorRole,
-    targetRole: targetRole,
-    title: '', // API에 title 필드가 없으므로 빈 문자열
+    authorRole,
+    targetRole,
+    title: '',
     content: apiData.text,
-    answer: apiData.isAnswered ? '' : undefined, // 답변 여부만 표시
-    revealAuthor: apiData.fromUser !== '익명', // 익명이 아니면 true
+    answer: apiData.isAnswered ? '' : undefined,
+    revealAuthor: true,
     publicToAll: apiData.isPublic,
     createdAt: new Date(),
+    fromUserId: apiData.fromUserId,
+    toUserId: apiData.toUserId,
   };
 };
 
@@ -221,9 +234,44 @@ export const getQuestionAnswer = async(customQId: string): Promise<QuestionAnswe
       throw new Error(`답변을 불러오는데 실패했습니다 (${response.status})`);
     }
 
-    const data = await response.json();
-    console.log('답변 데이터:', data);
-    return data;
+    const raw = await response.json();
+    console.log('답변 데이터(raw):', raw);
+
+    // 다양한 응답 포맷을 지원하도록 정규화
+    let normalized: QuestionAnswerResponse;
+
+    // 1. 직접 answerId, content 등이 있는 경우 (이미지의 형식)
+    if (raw?.answerId != null && raw?.content != null) {
+      normalized = {
+        answerText: String(raw.content),
+        answerBy: String(raw.displayName ?? raw.nickname ?? raw.username ?? ''),
+        answeredAt: String(raw.updatedAt ?? raw.createdAt ?? ''),
+      };
+    }
+    // 2. items 배열 스펙
+    else if (Array.isArray(raw?.items) && raw.items.length > 0) {
+      // 가장 최근 항목을 사용 (updatedAt/createdAt 기준)
+      const items = raw.items as Array<any>;
+      const pick = [...items].sort((a, b) => {
+        const ta = Date.parse(a?.updatedAt ?? a?.createdAt ?? 0);
+        const tb = Date.parse(b?.updatedAt ?? b?.createdAt ?? 0);
+        return tb - ta;
+      })[0];
+      normalized = {
+        answerText: String(pick?.content ?? ''),
+        answerBy: String(pick?.displayName ?? pick?.nickname ?? pick?.username ?? ''),
+        answeredAt: String(pick?.updatedAt ?? pick?.createdAt ?? ''),
+      };
+    }
+    // 3. 기타 형식 (하위 호환)
+    else {
+      normalized = {
+        answerText: raw?.answerText ?? raw?.content ?? raw?.text ?? '',
+        answerBy: raw?.answerBy ?? raw?.answeredBy ?? raw?.userName ?? '',
+        answeredAt: raw?.answeredAt ?? raw?.createdAt ?? '',
+      };
+    }
+    return normalized;
   } catch (error) {
     console.error('답변 조회 에러:', error);
     throw error;

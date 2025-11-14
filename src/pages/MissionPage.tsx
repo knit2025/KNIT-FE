@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
 import missionMarker from "../assets/missionMarker.svg";
 import { PATHS } from '../routes';
 import { useNavigate } from 'react-router-dom';
-import { getTodayMission, getCompletedMissions, checkCurrentUserSubmitted, type TodayMissionResponse, type CompletedMission } from '../api/missions';
+import { getTodayMission, getCompletedMissions, checkCurrentUserSubmittedById, type TodayMissionResponse, type CompletedMission } from '../api/missions';
 
 interface Mission {
   id: string;
@@ -21,6 +21,18 @@ export const MissionPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [localMissionCompleted, setLocalMissionCompleted] = useState(false);
+  const currentUserId = useMemo(() => {
+    const fromKey = localStorage.getItem('currentUserId');
+    if (fromKey) return Number(fromKey);
+    try {
+      const u = localStorage.getItem('user');
+      if (u) {
+        const parsed = JSON.parse(u);
+        if (parsed?.id != null) return Number(parsed.id);
+      }
+    } catch {}
+    return undefined;
+  }, []);
 
   useEffect(() => {
     const fetchMissions = async () => {
@@ -32,10 +44,10 @@ export const MissionPage = () => {
           getCompletedMissions()
         ]);
 
-        // 서버 응답의 userSubmissions에서 현재 사용자가 제출했는지 확인
-        // userName === loginId && isSubmitted === true
-        const isUserSubmitted = checkCurrentUserSubmitted(today.userSubmissions);
-        setLocalMissionCompleted(isUserSubmitted);
+        // 서버 응답의 userSubmissions에서 현재 사용자(userId 기준)가 제출했는지 확인
+        // 신규 스펙: userMissions 배열 기준(userId)
+        const selfSubmitted = checkCurrentUserSubmittedById(today.userMissions);
+        setLocalMissionCompleted(selfSubmitted);
 
         setTodayMission(today);
         setCompletedMissions(completed);
@@ -87,10 +99,10 @@ export const MissionPage = () => {
               {localMissionCompleted ? (
                 <div className="flex flex-col items-center justify-center">
                   <p className="text-[16px] font-semibold text-[#3A290D] text-center">
-                    오늘의 미션을 완수했습니다! 🎉
+                    오늘의 미션을 이미 제출했어요! 🎉
                   </p>
                   <p className="text-[12px] text-[#3A290D] mt-2 text-center">
-                    내일 새로운 미션으로 만나요
+                    다른 가족 구성원들의 참여를 응원해 주세요 👏
                   </p>
                 </div>
               ) : (

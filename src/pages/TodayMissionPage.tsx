@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
-import { getTodayMission, submitMission, checkCurrentUserSubmitted } from "../api/missions";
+import { getTodayMission, submitMission, checkCurrentUserSubmittedById } from "../api/missions";
 import { PATHS } from "../routes";
 import type { ChangeEvent } from "react";
 import Toast from "../components/Toast/Toast";
@@ -30,7 +30,7 @@ export const TodayMissionPage = () => {
 
         // 서버 응답의 userSubmissions에서 이미 제출했는지 확인
         // userName === loginId && isSubmitted === true
-        if (checkCurrentUserSubmitted(mission.userSubmissions)) {
+        if (checkCurrentUserSubmittedById(mission.userMissions)) {
           setToastMsg('이미 제출한 미션입니다');
           setToastOpen(true);
           // 토스트 표시 후 미션 목록으로 이동

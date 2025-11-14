@@ -3,73 +3,73 @@ import { useNavigate } from 'react-router-dom';
 import type { QuestionTarget, CreateQuestionForm } from '../types/question';
 import Header from '../components/Header/Header';
 import SectionCard from '../components/Question/SectionCard';
-import OptionGroup, { YesNoGroup } from '../components/Question/OptionGroup';
+import OptionGroup, { YesNoGroup, type OptionItem } from '../components/Question/OptionGroup';
 import TextAreaField from '../components/Question/TextAreaField';
 import PrimaryButton from '../components/Question/PrimaryButton';
 import Footer from '../components/Footer/Footer';
 import { PATHS } from '../routes';
 import { createQuestion } from '../api/questions';
-import { getFamily, getCurrentUser } from '../api/family';
-import { getCurrentUserRole } from '../api/config';
+import { getFamily } from '../api/family';
 
 export const CreateQuestionPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Partial<CreateQuestionForm>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [targetOptions, setTargetOptions] = useState<{ label: string; value: QuestionTarget }[]>([]);
+  const [targetOptions, setTargetOptions] = useState<OptionItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // ID → number 매핑 저장 (API 호출 시 사용)
-  const [idToNumberMap, setIdToNumberMap] = useState<Map<string, number | null>>(new Map());
+  // 선택된 대상 사용자 ID (모두에게는 -1로 표기 후 전송 시 null로 변환)
+  const [selectedToUser, setSelectedToUser] = useState<number | undefined>();
 
   // 가족 구성원 정보 가져오기
   useEffect(() => {
     const fetchFamilyMembers = async () => {
       try {
         setLoading(true);
-        const currentUser = getCurrentUser();
-        const currentRole = getCurrentUserRole();
         const familyData = await getFamily();
 
-        // ID → number 매핑 생성 (API 호출 시 사용)
-        const mapping = new Map<string, number | null>();
+        // localStorage에서 loginId 가져오기
+        const loginId = localStorage.getItem('loginId');
+        console.log('localStorage loginId:', loginId);
+
+        // loginId로 현재 사용자 찾기
+        let currentUserId: number | null = null;
+        if (loginId) {
+          const currentUser = familyData.users.find(user => user.loginId === loginId);
+          if (currentUser) {
+            currentUserId = currentUser.id;
+            console.log('현재 사용자 ID:', currentUserId, '(loginId:', loginId, ')');
+          } else {
+            console.warn('loginId와 일치하는 사용자를 찾을 수 없습니다:', loginId);
+          }
+        } else {
+          console.warn('localStorage에 loginId가 없습니다');
+        }
 
         // 자기 자신을 제외한 가족 구성원의 역할 추출
-        // label: role, value: user ID (string)
-        const options: { label: string; value: QuestionTarget }[] = familyData.users
+        // label: role, value: user ID (number)
+        const options: OptionItem[] = familyData.users
           .filter(user => {
-            // 1) id가 있으면 id로 필터
-            if (currentUser?.id != null) {
-              return user.id !== currentUser.id;
+            // loginId로 찾은 현재 사용자 ID로 필터링
+            if (currentUserId !== null) {
+              return user.id !== currentUserId;
             }
-            // 2) fallback: 로컬에 저장된 현재 역할이 있으면 role로 필터
-            if (currentRole) {
-              return user.role !== currentRole;
-            }
-            // 3) 아무 정보도 없으면 필터하지 않음
+            // loginId를 찾지 못한 경우 모든 사용자 포함
+            console.warn('현재 사용자 ID를 찾지 못해 필터링하지 않습니다');
             return true;
           })
-          .map(user => {
-            const userId = user.id.toString();
-            mapping.set(userId, user.id); // string key → number value
-            return {
-              label: user.role, // 화면에 표시될 역할 이름
-              value: userId as QuestionTarget, // 선택용 user ID (string)
-            };
-          });
+          .map(user => ({
+            label: user.role,
+            value: user.id,
+          }));
 
         // "모두에게" 옵션을 마지막에 추가
-        options.push({ label: "모두에게", value: "모두에게" });
-        mapping.set("모두에게", null); // "모두에게"는 null로 전송
+        options.push({ label: "모두에게", value: -1 }); // 전송 시 null로 변환
 
         setTargetOptions(options);
-        setIdToNumberMap(mapping);
       } catch (error) {
         console.error('가족 정보 불러오기 실패:', error);
         // 에러 시 기본 옵션 사용
-        const defaultMap = new Map<string, number | null>();
-        defaultMap.set("모두에게", null);
-        setTargetOptions([{ label: "모두에게", value: "모두에게" }]);
-        setIdToNumberMap(defaultMap);
+        setTargetOptions([{ label: "모두에게", value: -1 }]);
       } finally {
         setLoading(false);
       }
@@ -79,7 +79,9 @@ export const CreateQuestionPage = () => {
   }, []);
 
   const handleTargetSelect = useCallback((target: string | number | boolean) => {
-    setFormData((prev) => ({ ...prev, targetRole: target as QuestionTarget }));
+    // 숫자면 그대로, 그 외는 모두에게(-1)로 처리
+    const num = typeof target === 'number' ? target : -1;
+    setSelectedToUser(num);
   }, []);
 
   const handleRevealAuthor = useCallback((reveal: boolean) => {
@@ -95,17 +97,14 @@ export const CreateQuestionPage = () => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (!formData.targetRole || !formData.content?.trim()) return;
+    if (selectedToUser === undefined || !formData.content?.trim()) return;
     if (isSubmitting) return; // 중복 제출 방지
 
     setIsSubmitting(true);
 
     try {
-      // ID → number 변환 (또는 "모두에게" → null)
-      const toUser = idToNumberMap.get(formData.targetRole);
-      if (toUser === undefined) {
-        throw new Error('선택한 대상의 정보를 찾을 수 없습니다');
-      }
+      // 선택값 -1은 모두에게(null)로 전송
+      const toUser = selectedToUser === -1 ? null : selectedToUser;
 
       const result = await createQuestion(
         toUser, // number 또는 null (모두에게)
@@ -126,11 +125,13 @@ export const CreateQuestionPage = () => {
       );
       setIsSubmitting(false);
     }
-  }, [formData, navigate, isSubmitting, idToNumberMap]);
+  }, [formData, navigate, isSubmitting, selectedToUser]);
 
   const canSubmit = useMemo(() => {
-    return Boolean(formData.targetRole && formData.content?.trim());
-  }, [formData.targetRole, formData.content]);
+    // -1(모두에게)도 선택된 것으로 인정
+    const hasTarget = selectedToUser !== undefined;
+    return Boolean(hasTarget && formData.content?.trim());
+  }, [selectedToUser, formData.content]);
 
   // 흐름 기반 레이아웃 사용으로 별도 동적 위치/높이 계산이 필요 없습니다.
 
@@ -161,11 +162,7 @@ export const CreateQuestionPage = () => {
           {/* 섹션: 누구에게 질문 */}
           <SectionCard title="누구에게 질문하고 싶으신가요?" className="rounded-[14px]">
             {targetOptions.length > 0 ? (
-              <OptionGroup
-                options={targetOptions}
-                value={formData.targetRole}
-                onChange={handleTargetSelect}
-              />
+              <OptionGroup options={targetOptions} value={selectedToUser} onChange={handleTargetSelect} />
             ) : (
               <div className="text-[#3A290D] text-sm">가족 구성원을 불러올 수 없습니다</div>
             )}

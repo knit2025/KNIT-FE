@@ -37,12 +37,28 @@ export const checkCurrentUserSubmitted = (userSubmissions?: UserSubmission[]): b
   );
 };
 
+export interface UserMission {
+  userId: number;
+  userName?: string; // 서버 필드가 다양할 수 있어 유연하게
+  username?: string;
+  nickName?: string;
+  nickname?: string;
+  isSubmitted?: boolean;
+  opinion?: string;
+  image?: string;
+  createdAt?: string;
+  updateAt?: string;
+}
+
 export interface TodayMissionResponse {
   missionId: number;
   missionInstanceId: number;
   title: string;
   content: string;
-  userSubmissions?: UserSubmission[]; // 서버에서 제공하는 제출 현황
+  // 신규 스펙: userMissions 배열 제공 (userId 기반)
+  userMissions?: UserMission[];
+  // 구 스펙 호환: 일부 환경에서 userSubmissions를 사용할 수 있음
+  userSubmissions?: UserSubmission[];
   // isCompleted는 가족 전체 완료 여부를 나타내므로 제거
   // 개인의 제출 여부는 userSubmissions의 isSubmitted로 확인
 }
@@ -83,6 +99,27 @@ export interface MissionDetailResponse {
   completedDate: string;
   userSubmissions: UserSubmission[];
 }
+
+/**
+ * 현재 사용자가 제출했는지(userId 기반) 확인
+ */
+export const checkCurrentUserSubmittedById = (items?: UserMission[]): boolean => {
+  if (!items || items.length === 0) return false;
+  // currentUserId 우선, 없으면 user.id 보조
+  const idStr = localStorage.getItem('currentUserId');
+  let currentId: number | undefined = idStr ? Number(idStr) : undefined;
+  if (currentId == null) {
+    try {
+      const userRaw = localStorage.getItem('user');
+      if (userRaw) {
+        const u = JSON.parse(userRaw);
+        if (u?.id != null) currentId = Number(u.id);
+      }
+    } catch {}
+  }
+  if (currentId == null) return false;
+  return items.some((it) => it.userId === currentId && it.isSubmitted === true);
+};
 
 /**
  * 오늘의 미션 조회
