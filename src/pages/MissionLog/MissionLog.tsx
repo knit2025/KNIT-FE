@@ -25,6 +25,7 @@ interface Mission {
   missionId: number;
   title: string;
   text: string;
+  missionInstanceId: number;
   image?: string; //추가
   isCompleted: boolean;
   createdAt: string;
@@ -57,17 +58,28 @@ const MissionLog = () => {
     navigate("/AddPhoto");
   };
 
-  const MPhotoClick = (postId: number) => {
-    navigate(`/PhotoDetail/${postId}`);
-  };
-  const AnsClick = (missionId: number) => {
-    navigate(`/AnswerDetail/${missionId}`);
-  };
-  const MisstonClick = (missionId: number) => {
-    navigate(`/MissionDetail/${missionId}`);
-  };
+const MPhotoClick = (postId: number) => {
+  navigate(`/PhotoDetail/${postId}`);
+};
+const AnsClick = (missionId: number) => {
+  navigate(`/AnswerDetail/${missionId}`);
+};
+const MisstonClick = (missionInstanceId: number) => {
+  navigate(`/MissionDetail/${missionInstanceId}`);
+};
 
-  // 데이터 로딩 함수 분리
+ // 데이터 로딩 함수 분리
+
+  // const MPhotoClick = (postId: number) => {
+  //   navigate(`/PhotoDetail/${postId}`);
+  // };
+  // const AnsClick = (missionId: number) => {
+  //   navigate(`/AnswerDetail/${missionId}`);
+  // };
+  // const MisstonClick = (missionId: number) => {
+  //   navigate(`/MissionDetail/${missionId}`);
+  // };
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -85,17 +97,9 @@ const MissionLog = () => {
     loadData();
   }, []);
 
-  // useEffect(() => {
-  //   getMemoryData()
-  //     .then(res => {
-  //       console.log("Memory 데이터:", res); // ← 여기에 있어야 콘솔에 뜸
-  //       setData(res)
-  //     })
-  //     .catch((err) => console.error("데이터 불러오기 실패:", err));
-  // }, []);
 
   return (
-    <div className="overflow-y-auto pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
+    <div className="pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
       <img
         src={KNITLG}
         alt="KNITLG"
@@ -104,6 +108,7 @@ const MissionLog = () => {
       <div className="pl-[23px] text-left ml-2 mt-5 mb-[36px] text-[18px] font-semibold text-[#3A290D]">
         우리가족의 소중한 추억
       </div>
+      <div className="flex-1 overflow-y-auto">
       <div className="mr-[23px] flex gap-4 justify-end mb-3">
         <div className="flex gap-1 cursor-pointer">
           <img src={DotIcon} alt="DotIcon" className="" />
@@ -133,7 +138,7 @@ const MissionLog = () => {
           style={{
             // 게시물 고정
             gridTemplateColumns: "repeat(3, 104px)",
-            gridAutoFlow: "row dense", // 빈 공간 채우기
+            gridAutoFlow: "row dense", 
           }}
         >
           {data?.posts.map((p) => (
@@ -169,21 +174,63 @@ const MissionLog = () => {
             </div>
           ))}
 
-          {/* 중간 카드 */}
-          {/* {data?.missions.slice(0, 1).map((m) => ( 
-    <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer" onClick={() => MisstonClick(m.missionId)}>
-      <div className="flex items-center h-full p-3">
-        <div className="bg-white rounded-2xl  text-black w-[110px] h-[75px] flex items-center justify-center mr-3">{m.image ? <img src={m.image} alt="post" className="w-full h-full object-cover rounded-2xl" /> : "사진"}</div>
-        <div className="flex flex-col items-start justify-start text-left">
-          <span className="text-[13px] text-[#3A290D]">{m.title}</span>
-          <div className="font-gabia  text-[#454343] text-[12px]">{m.text}</div>
-        </div>
+    {/* 중간 카드 */}
+{data?.missions.slice(0, 1).map((m) => ( 
+  <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer"  onClick={() => MisstonClick(m.missionInstanceId)} >
+    <div className="flex items-center h-full p-3">
+      <div className="bg-white rounded-2xl text-black w-[110px] h-[75px] flex items-center justify-center mr-3 overflow-hidden">
+ {m.image ? (
+    <img
+      src={
+        m.image.startsWith('/')
+          ? `${import.meta.env.VITE_API_BASE_URL}${m.image}`
+          : `${import.meta.env.VITE_API_BASE_URL}/${m.image}`
+      }
+      alt="mission"
+      className="w-full h-full object-cover rounded-2xl"
+      onError={() => console.error("이미지 로드 실패:", m.image)}
+    />
+  ) : (
+    <div className="text-gray-400">사진</div>
+  )}
+      </div>
+      <div className="flex flex-col items-start justify-start text-left">
+        <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+        <div className="font-gabia text-[#454343] text-[12px]">{m.text}</div>
       </div>
     </div>
-    ))} */}
+  </div>
+))}
+
+    {/* 작은 카드 */}
+    {data?.missions.slice(1).map((m) => (
+  <div 
+    key={m.missionId} 
+    className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer"
+    onClick={() => {
+      if (m.missionInstanceId) {
+        // 미션이면 → MissionDetail
+        MisstonClick(m.missionInstanceId);
+      } else {
+        // 답변이면 → AnswerDetail
+        AnsClick(m.missionId);
+      }
+    }}
+  >
+    <div className="flex items-center h-full p-3">
+      <div className="flex flex-col items-start justify-start text-left">
+        <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+        <div className="font-gabia text-[#454343] text-[11px]">{m.text}</div>
+      </div>
+    </div>
+  </div>
+))}
+
+  </div>
+</div>
 
           {/* 중간 카드 */}
-          {data?.missions.slice(0, 1).map((m) => (
+          {/* {data?.missions.slice(0, 1).map((m) => (
             <div
               key={m.missionId}
               className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer"
@@ -212,10 +259,10 @@ const MissionLog = () => {
                 </div>
               </div>
             </div>
-          ))}
+          ))} */}
 
           {/* 작은 카드 */}
-          {data?.missions.slice(1).map((m) => (
+          {/* {data?.missions.slice(1).map((m) => (
             <div
               key={m.missionId}
               className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer"
@@ -232,7 +279,8 @@ const MissionLog = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
+</div>
       <button
         type="button"
         className="absolute right-[23px] bottom-[calc(100px+16px)] cursor-pointer z-50"
