@@ -15,7 +15,6 @@ interface QuestionDetailPageProps {
 export const QuestionDetailPage = ({
   question,
   onSubmit,
-  onBack
 }: QuestionDetailPageProps) => {
   const [answer, setAnswer] = useState('');
   const [existingAnswer, setExistingAnswer] = useState<string | null>(null);
