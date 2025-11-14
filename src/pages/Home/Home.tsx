@@ -5,6 +5,17 @@ import ItemCarousel from "../../components/Home/ItemCarousel";
 import ProgressBar from "../../components/Home/ProgressBar";
 import { useState } from "react";
 import SheepCharacter from "../../components/Home/SheepCharacter";
+import axios from "axios";
+import { useEffect } from "react";
+
+type TodayQuestion = {
+  instanceId: number;
+  content: string;
+  isCurrent: boolean;
+  status: string;
+  answeredUsers: string[];
+  totalMembers: number;
+};
 
 const items = [
   { id: 1, name: "스웨터", currentPoint: 0, maxPoint: 10 },
@@ -19,6 +30,8 @@ const items = [
   { id: 10, name: "단추", currentPoint: 0, maxPoint: 10 },
 ];
 const Home: React.FC = () => {
+  const [todayQuestion, setTodayQuestion] = useState<string>("");
+  const [loading, setLoading] = useState(true);
   const [itemList, setItemList] = useState(items);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
 
@@ -43,6 +56,28 @@ const Home: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    const fetchTodayQuestion = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get<TodayQuestion>(
+          `${import.meta.env.VITE_API_BASE_URL}/home/today-question`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setTodayQuestion(res.data.content);
+      } catch (err) {
+        console.error("오늘의 질문 불러오기 실패:", err);
+        setTodayQuestion("오늘의 질문을 불러올 수 없습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTodayQuestion();
+  }, []);
+
   return (
     <>
       <div className="relative mx-auto w-[390px] h-screen flex flex-col justify-center items-center bg-linear-to-b from-[#FFFFFF] to-[#DBBBA4]">
@@ -63,8 +98,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col">
             <img className="w-[9.969rem] h-35.25" src={messageImg}></img>
             <p className="font-gabia -mt-25 z-10 text-[#3A290D] text-[0.75rem]">
-              "오늘 내가 가족에게
-              <br /> 베푼 작은 친절은?"
+              {loading ? "질문 불러오는 중..." : `" ${todayQuestion} "`}
             </p>
           </div>
         </div>

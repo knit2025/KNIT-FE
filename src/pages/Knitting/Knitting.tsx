@@ -13,7 +13,7 @@ const Knitting: React.FC = () => {
       setCurrentIndex((i) => {
         const nextIndex = (i + 1) % images.length;
         if (nextIndex === 0) {
-          window.location.href = "/kindness";
+          window.location.href = "/todayKindness";
         }
         return nextIndex;
       });
