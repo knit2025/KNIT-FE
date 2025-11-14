@@ -44,7 +44,7 @@ function OptionGroup({
   className = "",
 }: OptionGroupProps) {
   return (
-    <div className={`flex items-center justify-start gap-[18px] ${className}`}>
+    <div className={`grid grid-cols-4 gap-x-[18px] gap-y-[18px] ${className}`}>
       {options.map((option) => (
         <SelectableButton
           key={String(option.value ?? option.label)}
