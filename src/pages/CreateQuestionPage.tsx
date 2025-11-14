@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { QuestionTarget, CreateQuestionForm } from '../types/question';
 import Header from '../components/Header/Header';
@@ -9,30 +9,64 @@ import PrimaryButton from '../components/Question/PrimaryButton';
 import Footer from '../components/Footer/Footer';
 import { PATHS } from '../routes';
 import { createQuestion } from '../api/questions';
-
-
-const targetOptions: { label: string; value: QuestionTarget }[] = [
-  { label: "아빠", value: "아빠에게" },
-  { label: "엄마", value: "엄마에게" },
-  { label: "아들", value: "아들에게" },
-  { label: "모두에게", value: "모두에게" },
-];
-
-// QuestionTarget을 백엔드 role 문자열로 변환하는 헬퍼 함수
-// "엄마에게" → "엄마", "아빠에게" → "아빠"
-const getTargetRoleString = (targetRole: QuestionTarget): string => {
-  if (targetRole === '모두에게') return '모두';
-  // "엄마에게" → "엄마", "아빠에게" → "아빠" 등
-  return targetRole.replace('에게', '');
-};
+import { getFamily, getCurrentUser } from '../api/family';
 
 export const CreateQuestionPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Partial<CreateQuestionForm>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [targetOptions, setTargetOptions] = useState<{ label: string; value: QuestionTarget }[]>([]);
+  const [loading, setLoading] = useState(true);
+  // ID → role 매핑 저장 (API 호출 시 사용)
+  const [idToRoleMap, setIdToRoleMap] = useState<Map<string, string>>(new Map());
 
-  const handleTargetSelect = useCallback((target: QuestionTarget) => {
-    setFormData((prev) => ({ ...prev, targetRole: target }));
+  // 가족 구성원 정보 가져오기
+  useEffect(() => {
+    const fetchFamilyMembers = async () => {
+      try {
+        setLoading(true);
+        const currentUser = getCurrentUser();
+        const familyData = await getFamily();
+
+        // ID → role 매핑 생성
+        const mapping = new Map<string, string>();
+
+        // 자기 자신을 제외한 가족 구성원의 역할 추출
+        // 고유한 user ID를 value로 사용하여 중복 키 방지
+        const options: { label: string; value: QuestionTarget }[] = familyData.users
+          .filter(user => user.id !== currentUser?.id) // 자기 자신 제외
+          .map(user => {
+            const userId = user.id.toString();
+            mapping.set(userId, user.role);
+            return {
+              label: user.role,
+              value: userId as QuestionTarget, // ID를 고유 키로 사용
+            };
+          });
+
+        // "모두에게" 옵션을 마지막에 추가
+        options.push({ label: "모두에게", value: "모두에게" });
+        mapping.set("모두에게", "None");
+
+        setTargetOptions(options);
+        setIdToRoleMap(mapping);
+      } catch (error) {
+        console.error('가족 정보 불러오기 실패:', error);
+        // 에러 시 기본 옵션 사용
+        const defaultMap = new Map<string, string>();
+        defaultMap.set("모두에게", "None");
+        setTargetOptions([{ label: "모두에게", value: "모두에게" }]);
+        setIdToRoleMap(defaultMap);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFamilyMembers();
+  }, []);
+
+  const handleTargetSelect = useCallback((target: string | number | boolean) => {
+    setFormData((prev) => ({ ...prev, targetRole: target as QuestionTarget }));
   }, []);
 
   const handleRevealAuthor = useCallback((reveal: boolean) => {
@@ -54,15 +88,20 @@ export const CreateQuestionPage = () => {
     setIsSubmitting(true);
 
     try {
-      // API 호출
-      const toUserRole = getTargetRoleString(formData.targetRole);
+      // ID → role 변환
+      // "모두에게"는 그대로 "None"으로, 그 외는 매핑에서 role 조회
+      const role = idToRoleMap.get(formData.targetRole);
+      if (!role) {
+        throw new Error('선택한 대상의 역할을 찾을 수 없습니다');
+      }
+
       const result = await createQuestion(
-        toUserRole,
+        role, // 매핑된 role 사용 (예: "엄마", "아빠", "None")
         formData.content.trim(),
         !formData.revealAuthor, // revealAuthor가 false면 익명(isAnonymous=true)
         !!formData.publicToAll
       );
-      
+
       console.log('질문 생성 성공:', result);
 
       // API 호출 성공 후 목록 페이지로 이동
@@ -73,11 +112,19 @@ export const CreateQuestionPage = () => {
       alert(error instanceof Error ? error.message : '질문 생성에 실패했습니다');
       setIsSubmitting(false);
     }
-  }, [formData, navigate, isSubmitting]);
+  }, [formData, navigate, isSubmitting, idToRoleMap]);
 
   const canSubmit = useMemo(() => {
     return Boolean(formData.targetRole && formData.content?.trim());
   }, [formData.targetRole, formData.content]);
+
+  if (loading) {
+    return (
+      <div className="relative w-[390px] min-h-screen mx-auto bg-white overflow-hidden text-left flex items-center justify-center">
+        <div className="text-[#3A290D]">가족 정보를 불러오는 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-[390px] min-h-screen mx-auto bg-white overflow-hidden text-left">
@@ -98,11 +145,15 @@ export const CreateQuestionPage = () => {
           {/* 섹션: 누구에게 질문 - 79px 높이 */}
           <div className="absolute top-[190px] left-[25px] w-[340px] h-[79px]">
             <SectionCard title="누구에게 질문하고 싶으신가요?" className="rounded-[14px] h-full">
-              <OptionGroup
-                options={targetOptions}
-                value={formData.targetRole}
-                onChange={handleTargetSelect}
-              />
+              {targetOptions.length > 0 ? (
+                <OptionGroup
+                  options={targetOptions}
+                  value={formData.targetRole}
+                  onChange={handleTargetSelect}
+                />
+              ) : (
+                <div className="text-[#3A290D] text-sm">가족 구성원을 불러올 수 없습니다</div>
+              )}
             </SectionCard>
           </div>
 
