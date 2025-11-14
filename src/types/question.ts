@@ -18,6 +18,8 @@ export interface Question {
   createdAt: Date;                   // 작성 시간
   answeredAt?: Date;                 // 답변 시간 (선택)
   familyCode?: string;               // 가족 초대 코드
+  fromUserId?: number;               // 작성자 사용자 ID (선택)
+  toUserId?: number | null;          // 대상 사용자 ID (선택, 모두에게는 null)
 }
 
 // 사용자 인터페이스

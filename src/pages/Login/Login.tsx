@@ -5,6 +5,7 @@ import knitLogo from "../../assets/login-knit-logo.png";
 import "../../styles/Global.css";
 import axios from "axios";
 import { useState } from "react";
+import { getFamily } from "../../api/family";
 import { useNavigate } from "react-router-dom";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -30,7 +31,7 @@ const Login: React.FC = () => {
         loginId,
         password,
       });
-      const { access, loginId: returnedId } = response.data;
+      const { access, loginId: returnedId } = response.data || {};
 
       if (!access) {
         throw new Error("access 토큰이 없습니다.");
@@ -38,6 +39,44 @@ const Login: React.FC = () => {
       localStorage.setItem("accessToken", access);
       if (returnedId) {
         localStorage.setItem("loginId", returnedId);
+      }
+
+      // 백엔드가 사용자 정보를 함께 반환하는 경우 저장 (선택적, 안전하게 처리)
+      // 예: { user: { id, name, nickname, role, birth } } 또는 { role: "아들" }
+      try {
+        const user = (response.data && (response.data.user || response.data.profile)) || null;
+        const role = (response.data && (response.data.role || (user && user.role))) || null;
+        if (user) {
+          // 필요한 필드만 저장
+          const compact = {
+            id: user.id,
+            name: user.name,
+            nickname: user.nickname,
+            role: user.role,
+            birth: user.birth,
+          };
+          localStorage.setItem("user", JSON.stringify(compact));
+        }
+        if (role) {
+          localStorage.setItem("user_role", String(role));
+        }
+      } catch { /* noop: 응답 포맷이 달라도 앱은 동작 */ }
+
+      // 로그인 후 가족 정보 불러와 id→role 매핑 저장
+      try {
+        const family = await getFamily();
+        const map: Record<number, string> = {};
+        (family.users as any[]).forEach((u: any) => {
+          map[Number(u.id)] = String(u.role);
+        });
+        localStorage.setItem("userRoleMap", JSON.stringify(map));
+
+        // 현재 사용자 ID도 저장 시도 (loginId 매칭되는 항목이 있으면)
+        const loginIdStored = localStorage.getItem("loginId");
+        const me = (family.users as any[]).find((u: any) => u.loginId === loginIdStored);
+        if (me?.id != null) localStorage.setItem("currentUserId", String(me.id));
+      } catch (e) {
+        console.warn("가족 정보 저장 스킵:", e);
       }
 
       setLoginId("");

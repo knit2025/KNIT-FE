@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Question } from "../types/question";
 import Header from "../components/Header/Header";
 import { QuestionCard } from "../components/QuestionCard/QuestionCard";
@@ -19,23 +19,31 @@ QuestionDetailPageProps) => {
   const [answer, setAnswer] = useState("");
   const [existingAnswer, setExistingAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const currentUserId = useMemo(() => {
+    const v = localStorage.getItem('currentUserId');
+    return v ? Number(v) : undefined;
+  }, []);
 
   // 컴포넌트 마운트 시 답변이 있으면 가져오기
   useEffect(() => {
     const fetchAnswer = async () => {
-      // question에 이미 answer가 있으면 사용
-      if (question.answer) {
+      // question에 이미 answer가 있고 내용이 있으면 사용 (빈 문자열은 제외)
+      if (question.answer && question.answer.trim()) {
         setExistingAnswer(question.answer);
         setAnswer(question.answer);
         setLoading(false);
         return;
       }
 
-      // answer가 없으면 API 호출해서 가져오기
+      // answer가 없거나 빈 문자열이면 API 호출해서 실제 답변 가져오기
       try {
         const answerData = await getQuestionAnswer(question.id);
-        setExistingAnswer(answerData.answerText);
-        setAnswer(answerData.answerText);
+        // 답변이 있는 경우에만 상태 업데이트
+        if (answerData.answerText && answerData.answerText.trim()) {
+          setExistingAnswer(answerData.answerText);
+          setAnswer(answerData.answerText);
+        }
       } catch (err) {
         // 답변이 없는 경우 에러가 발생할 수 있음 (정상)
         console.log("답변이 아직 없습니다:", err);
@@ -47,9 +55,23 @@ QuestionDetailPageProps) => {
     fetchAnswer();
   }, [question]);
 
-  const handleSubmit = () => {
-    if (answer.trim()) {
-      createQuestionAnswer(question.id, answer);
+  const handleSubmit = async () => {
+    const content = answer.trim();
+    if (!content || submitting) return;
+
+    try {
+      setSubmitting(true);
+      const body = { content };
+      console.log('답변 전송 Body:', body);
+      await createQuestionAnswer(question.id, content);
+      // 성공 시 화면 상태 업데이트: 더 이상 편집 불가하도록 고정
+      setExistingAnswer(content);
+    } catch (err) {
+      console.error('답변 등록 실패:', err);
+      // 필요 시 토스트 또는 경고로 대체 가능
+      alert(err instanceof Error ? err.message : '답변 등록에 실패했습니다');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -82,16 +104,20 @@ QuestionDetailPageProps) => {
         <div className="absolute top-[193px] left-[25px] w-[340px] h-[443px]">
           <QuestionCard
             question={question}
-            editable={!existingAnswer} // 답변이 있으면 수정 불가
+            editable={
+              // 답변이 없고, 현재 사용자가 작성자가 아닌 경우에만 편집 가능
+              !existingAnswer && !(currentUserId != null && question.fromUserId != null && currentUserId === question.fromUserId)
+            }
+            showAnswerButton={!(currentUserId != null && question.fromUserId != null && currentUserId === question.fromUserId)}
             answerValue={answer}
             onChangeAnswer={setAnswer}
           />
         </div>
 
-        {/* 작성 완료 버튼 - 답변이 없을 때만 표시 */}
-        {!existingAnswer && (
+        {/* 작성 완료 버튼 - 답변이 없고, 작성자가 현재 사용자가 아닐 때만 표시 */}
+        {!existingAnswer && !(currentUserId != null && question.fromUserId != null && currentUserId === question.fromUserId) && (
           <div className="absolute top-[680px] left-[46px] w-[298px]">
-            <PrimaryButton onClick={handleSubmit} disabled={!answer?.trim()}>
+            <PrimaryButton onClick={handleSubmit} disabled={!answer?.trim() || submitting}>
               작성 완료
             </PrimaryButton>
           </div>

@@ -3,60 +3,73 @@ import { useNavigate } from 'react-router-dom';
 import type { QuestionTarget, CreateQuestionForm } from '../types/question';
 import Header from '../components/Header/Header';
 import SectionCard from '../components/Question/SectionCard';
-import OptionGroup, { YesNoGroup } from '../components/Question/OptionGroup';
+import OptionGroup, { YesNoGroup, type OptionItem } from '../components/Question/OptionGroup';
 import TextAreaField from '../components/Question/TextAreaField';
 import PrimaryButton from '../components/Question/PrimaryButton';
 import Footer from '../components/Footer/Footer';
 import { PATHS } from '../routes';
 import { createQuestion } from '../api/questions';
-import { getFamily, getCurrentUser } from '../api/family';
+import { getFamily } from '../api/family';
 
 export const CreateQuestionPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Partial<CreateQuestionForm>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [targetOptions, setTargetOptions] = useState<{ label: string; value: QuestionTarget }[]>([]);
+  const [targetOptions, setTargetOptions] = useState<OptionItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // ID → role 매핑 저장 (API 호출 시 사용)
-  const [idToRoleMap, setIdToRoleMap] = useState<Map<string, string>>(new Map());
+  // 선택된 대상 사용자 ID (모두에게는 -1로 표기 후 전송 시 null로 변환)
+  const [selectedToUser, setSelectedToUser] = useState<number | undefined>();
 
   // 가족 구성원 정보 가져오기
   useEffect(() => {
     const fetchFamilyMembers = async () => {
       try {
         setLoading(true);
-        const currentUser = getCurrentUser();
         const familyData = await getFamily();
 
-        // ID → role 매핑 생성
-        const mapping = new Map<string, string>();
+        // localStorage에서 loginId 가져오기
+        const loginId = localStorage.getItem('loginId');
+        console.log('localStorage loginId:', loginId);
+
+        // loginId로 현재 사용자 찾기
+        let currentUserId: number | null = null;
+        if (loginId) {
+          const currentUser = familyData.users.find(user => user.loginId === loginId);
+          if (currentUser) {
+            currentUserId = currentUser.id;
+            console.log('현재 사용자 ID:', currentUserId, '(loginId:', loginId, ')');
+          } else {
+            console.warn('loginId와 일치하는 사용자를 찾을 수 없습니다:', loginId);
+          }
+        } else {
+          console.warn('localStorage에 loginId가 없습니다');
+        }
 
         // 자기 자신을 제외한 가족 구성원의 역할 추출
-        // 고유한 user ID를 value로 사용하여 중복 키 방지
-        const options: { label: string; value: QuestionTarget }[] = familyData.users
-          .filter(user => user.id !== currentUser?.id) // 자기 자신 제외
-          .map(user => {
-            const userId = user.id.toString();
-            mapping.set(userId, user.role);
-            return {
-              label: user.role,
-              value: userId as QuestionTarget, // ID를 고유 키로 사용
-            };
-          });
+        // label: role, value: user ID (number)
+        const options: OptionItem[] = familyData.users
+          .filter(user => {
+            // loginId로 찾은 현재 사용자 ID로 필터링
+            if (currentUserId !== null) {
+              return user.id !== currentUserId;
+            }
+            // loginId를 찾지 못한 경우 모든 사용자 포함
+            console.warn('현재 사용자 ID를 찾지 못해 필터링하지 않습니다');
+            return true;
+          })
+          .map(user => ({
+            label: user.role,
+            value: user.id,
+          }));
 
         // "모두에게" 옵션을 마지막에 추가
-        options.push({ label: "모두에게", value: "모두에게" });
-        mapping.set("모두에게", "None");
+        options.push({ label: "모두에게", value: -1 }); // 전송 시 null로 변환
 
         setTargetOptions(options);
-        setIdToRoleMap(mapping);
       } catch (error) {
         console.error('가족 정보 불러오기 실패:', error);
         // 에러 시 기본 옵션 사용
-        const defaultMap = new Map<string, string>();
-        defaultMap.set("모두에게", "None");
-        setTargetOptions([{ label: "모두에게", value: "모두에게" }]);
-        setIdToRoleMap(defaultMap);
+        setTargetOptions([{ label: "모두에게", value: -1 }]);
       } finally {
         setLoading(false);
       }
@@ -66,7 +79,9 @@ export const CreateQuestionPage = () => {
   }, []);
 
   const handleTargetSelect = useCallback((target: string | number | boolean) => {
-    setFormData((prev) => ({ ...prev, targetRole: target as QuestionTarget }));
+    // 숫자면 그대로, 그 외는 모두에게(-1)로 처리
+    const num = typeof target === 'number' ? target : -1;
+    setSelectedToUser(num);
   }, []);
 
   const handleRevealAuthor = useCallback((reveal: boolean) => {
@@ -82,21 +97,17 @@ export const CreateQuestionPage = () => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (!formData.targetRole || !formData.content?.trim()) return;
+    if (selectedToUser === undefined || !formData.content?.trim()) return;
     if (isSubmitting) return; // 중복 제출 방지
 
     setIsSubmitting(true);
 
     try {
-      // ID → role 변환
-      // "모두에게"는 그대로 "None"으로, 그 외는 매핑에서 role 조회
-      const role = idToRoleMap.get(formData.targetRole);
-      if (!role) {
-        throw new Error('선택한 대상의 역할을 찾을 수 없습니다');
-      }
+      // 선택값 -1은 모두에게(null)로 전송
+      const toUser = selectedToUser === -1 ? null : selectedToUser;
 
       const result = await createQuestion(
-        role, // 매핑된 role 사용 (예: "엄마", "아빠", "None")
+        toUser, // number 또는 null (모두에게)
         formData.content.trim(),
         !formData.revealAuthor, // revealAuthor가 false면 익명(isAnonymous=true)
         !!formData.publicToAll
@@ -114,43 +125,15 @@ export const CreateQuestionPage = () => {
       );
       setIsSubmitting(false);
     }
-  }, [formData, navigate, isSubmitting, idToRoleMap]);
+  }, [formData, navigate, isSubmitting, selectedToUser]);
 
   const canSubmit = useMemo(() => {
-    return Boolean(formData.targetRole && formData.content?.trim());
-  }, [formData.targetRole, formData.content]);
+    // -1(모두에게)도 선택된 것으로 인정
+    const hasTarget = selectedToUser !== undefined;
+    return Boolean(hasTarget && formData.content?.trim());
+  }, [selectedToUser, formData.content]);
 
-  // role 옵션 개수에 따른 카드 높이 계산
-  // 한 줄에 최대 4개, 버튼 높이 24px, gap 18px 고려
-  const targetCardHeight = useMemo(() => {
-    const optionCount = targetOptions.length;
-    if (optionCount === 0) return 79;
-
-    // 한 줄에 4개씩 배치
-    const rows = Math.ceil(optionCount / 4);
-    // 기본 패딩 + (버튼 높이 24px * 줄 수) + (줄 간격 18px * (줄 수 - 1))
-    const baseHeight = 80; // 상하 패딩
-    const buttonHeight = 24;
-    const gap = 18;
-
-    return baseHeight + (buttonHeight * rows) + (gap * Math.max(0, rows - 1));
-  }, [targetOptions.length]);
-
-  // 각 섹션의 동적 위치 계산
-  const sectionPositions = useMemo(() => {
-    const titleTop = 131;
-    const firstSectionTop = 190;
-    const sectionGap = 15; // 섹션 간 간격
-
-    return {
-      title: titleTop,
-      targetRole: firstSectionTop,
-      revealAuthor: firstSectionTop + targetCardHeight + sectionGap,
-      publicToAll: firstSectionTop + targetCardHeight + sectionGap + 79 + sectionGap,
-      content: firstSectionTop + targetCardHeight + sectionGap + 79 + sectionGap + 79 + sectionGap,
-      button: firstSectionTop + targetCardHeight + sectionGap + 79 + sectionGap + 79 + sectionGap + 188 + 18,
-    };
-  }, [targetCardHeight]);
+  // 흐름 기반 레이아웃 사용으로 별도 동적 위치/높이 계산이 필요 없습니다.
 
   if (loading) {
     return (
@@ -169,87 +152,48 @@ export const CreateQuestionPage = () => {
       <div className="pointer-events-none absolute left-0 top-0 w-full h-[110px] bg-white z-40" />
 
       {/* 스크롤 가능한 컨텐츠 래퍼 (푸터 높이만큼 여유) */}
-        <div className="absolute inset-x-0 top-0 bottom-[140px] scroll-container">
-
+      <div className="absolute inset-x-0 top-0 bottom-[86px] scroll-container">
+        <div className="px-[25px] pt-[131px] pb-[120px] space-y-[15px]">
           {/* 제목 */}
-          <h1
-            className="absolute left-[30px] text-[20px] font-semibold text-[#3A290D]"
-            style={{ top: `${sectionPositions.title}px` }}
-          >
+          <h1 className="text-[20px] font-semibold text-[#3A290D]">
             궁금했던 이야기들 천천히 꺼내볼까요?
           </h1>
 
-          {/* 섹션: 누구에게 질문 - 동적 높이 */}
-          <div
-            className="absolute left-[25px] w-[340px]"
-            style={{
-              top: `${sectionPositions.targetRole}px`,
-              height: `${targetCardHeight}px`
-            }}
-          >
-            <SectionCard title="누구에게 질문하고 싶으신가요?" className="rounded-[14px] h-full">
-              {targetOptions.length > 0 ? (
-                <OptionGroup
-                  options={targetOptions}
-                  value={formData.targetRole}
-                  onChange={handleTargetSelect}
-                />
-              ) : (
-                <div className="text-[#3A290D] text-sm">가족 구성원을 불러올 수 없습니다</div>
-              )}
-            </SectionCard>
-          </div>
+          {/* 섹션: 누구에게 질문 */}
+          <SectionCard title="누구에게 질문하고 싶으신가요?" className="rounded-[14px]">
+            {targetOptions.length > 0 ? (
+              <OptionGroup options={targetOptions} value={selectedToUser} onChange={handleTargetSelect} />
+            ) : (
+              <div className="text-[#3A290D] text-sm">가족 구성원을 불러올 수 없습니다</div>
+            )}
+          </SectionCard>
 
-          {/* 섹션: 나를 드러낼까요 - 79px 높이 */}
-          <div
-            className="absolute left-[25px] w-[340px] h-[79px]"
-            style={{ top: `${sectionPositions.revealAuthor}px` }}
-          >
-            <SectionCard title="나를 드러낼까요?" className="rounded-[14px] h-full">
-              <YesNoGroup value={formData.revealAuthor} onChange={handleRevealAuthor} />
-            </SectionCard>
-          </div>
+          {/* 섹션: 나를 드러낼까요? */}
+          <SectionCard title="나를 드러낼까요?" className="rounded-[14px]">
+            <YesNoGroup value={formData.revealAuthor} onChange={handleRevealAuthor} />
+          </SectionCard>
 
-          {/* 섹션: 모두에게 공개 - 79px 높이 */}
-          <div
-            className="absolute left-[25px] w-[340px] h-[79px]"
-            style={{ top: `${sectionPositions.publicToAll}px` }}
-          >
-            <SectionCard title="질문을 모두에게 공개할까요?" className="rounded-[14px] h-full">
-              <YesNoGroup value={formData.publicToAll} onChange={handlePublicToAll} />
-            </SectionCard>
-          </div>
+          {/* 섹션: 모두에게 공개 */}
+          <SectionCard title="질문을 모두에게 공개할까요?" className="rounded-[14px]">
+            <YesNoGroup value={formData.publicToAll} onChange={handlePublicToAll} />
+          </SectionCard>
 
-          {/* 섹션: 질문 내용 - 188px 높이 */}
-          <div
-            className="absolute left-[25px] w-[340px] h-[188px]"
-            style={{ top: `${sectionPositions.content}px` }}
-          >
-            <SectionCard title="편하게 물어보아요" variant="peach" className="rounded-[14px] h-full">
-              <TextAreaField
-                label="질문 내용"
-                value={formData.content || ''}
-                onChange={handleContentChange}
-                className="bg-transparent"
-              />
-            </SectionCard>
-          </div>
+          {/* 섹션: 질문 내용 */}
+          <SectionCard title="편하게 물어보아요" variant="peach" className="rounded-[14px]">
+            <TextAreaField
+              label="질문 내용"
+              value={formData.content || ''}
+              onChange={handleContentChange}
+              className="bg-transparent"
+            />
+          </SectionCard>
 
-          {/* 생성 완료 버튼 - 40px 높이 */}
-          <div
-            className="absolute left-[46px] w-[298px] h-[40px]"
-            style={{ top: `${sectionPositions.button}px` }}
-          >
+          {/* 생성 완료 버튼 */}
+          <div className="w-full flex justify-center">
             <PrimaryButton onClick={handleSubmit} disabled={!canSubmit}>
               생성 완료
             </PrimaryButton>
           </div>
-
-        {/* 생성 완료 버튼 - 40px 높이 */}
-        <div className="absolute top-[682px] left-[46px] w-[298px] h-[40px]">
-          <PrimaryButton onClick={handleSubmit} disabled={!canSubmit}>
-            생성 완료
-          </PrimaryButton>
         </div>
       </div>
 

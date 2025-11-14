@@ -8,6 +8,7 @@ import { PATHS } from '../routes';
 import Footer from '../components/Footer/Footer';
 import { getQuestionCards, mapApiToQuestion, getQuestionAnswer } from '../api/questions';
 import { getCurrentUserRole } from '../api/config';
+import { useMemo } from 'react';
 
 
 export const QuestionListPage = () => {
@@ -19,30 +20,34 @@ export const QuestionListPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortByAnswerable, setSortByAnswerable] = useState(false); // 답변 가능한 질문 정렬 상태
 
-  // 현재 사용자가 답변할 수 있는 질문인지 확인하는 함수
+  const currentUserId = useMemo(() => {
+    const v = localStorage.getItem('currentUserId');
+    return v ? Number(v) : undefined;
+  }, []);
+
+  // 현재 사용자가 답변할 수 있는 질문인지 확인 (ID 기준)
   const canAnswerQuestion = (question: Question): boolean => {
-    const currentUserRole = getCurrentUserRole();
-    if (!currentUserRole) return false;
-
-    // 이미 답변된 질문은 답변 불가
-    if (question.answer) return false;
-
-    // targetRole에서 "에게" 제거하여 비교 (예: "엄마에게" -> "엄마")
-    const targetRole = question.targetRole.replace('에게', '');
-
-    // "모두에게"인 경우 모두 답변 가능
-    if (question.targetRole === '모두에게') return true;
-
-    // 현재 사용자의 역할이 질문의 대상과 일치하는 경우에만 답변 가능
-    return currentUserRole === targetRole;
+    if (question.answer) return false; // 이미 답변됨
+    if (currentUserId == null) return false;
+    if (question.fromUserId != null && question.fromUserId === currentUserId) return false; // 작성자는 불가
+    if (question.toUserId == null) return true; // 모두에게
+    return question.toUserId === currentUserId; // 대상자가 현재 사용자
   };
 
   // API에서 질문 목록 불러오기
+  // 서버는 비공개(isPublic=false) 질문을 자동으로 필터링하여 반환합니다
+  // - 작성자 또는 대상인 경우에만 비공개 질문이 포함됨
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
         const data = await getQuestionCards();
+
+        // 404: 질문이 없는 경우 빈 배열로 처리
+        if (!data || data.length === 0) {
+          setAllQuestions([]);
+          return;
+        }
 
         // API 데이터를 Question 타입으로 변환하고 답변 가져오기
         const questionsWithAnswers = await Promise.all(
@@ -66,7 +71,14 @@ export const QuestionListPage = () => {
 
         setAllQuestions(questionsWithAnswers);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다');
+        console.error('질문 목록 조회 실패:', err);
+        // 404 에러는 질문이 없는 것으로 처리
+        if (err instanceof Error && err.message.includes('404')) {
+          setAllQuestions([]);
+          setError(null);
+        } else {
+          setError(err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다');
+        }
       } finally {
         setLoading(false);
       }
@@ -78,11 +90,10 @@ export const QuestionListPage = () => {
   // 답변 가능한 질문을 상단으로 정렬
   const sortedQuestions = sortByAnswerable
     ? [...allQuestions].sort((a, b) => {
-        const aCanAnswer = canAnswerQuestion(a);
-        const bCanAnswer = canAnswerQuestion(b);
-        if (aCanAnswer && !bCanAnswer) return -1;
-        if (!aCanAnswer && bCanAnswer) return 1;
-        return 0;
+        // 아직 답변 안했고(toUserId == currentUserId) 우선
+        const aScore = (a.answer ? 0 : 1) + (a.toUserId === currentUserId ? 2 : 0);
+        const bScore = (b.answer ? 0 : 1) + (b.toUserId === currentUserId ? 2 : 0);
+        return bScore - aScore;
       })
     : allQuestions;
 
@@ -129,19 +140,17 @@ export const QuestionListPage = () => {
 
       {/* 카드 스택 영역: 스택 자체는 스와이프/휠로만 이동 (스크롤 X) */}
       <div
-        className="absolute top-[191px] left-[25px] w-[340px] h-[443px] overflow-hidden"
+        className="absolute top-[191px] left-[25px] w-[340px] h-[570px] overflow-hidden"
       >
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-[#A9927F]">질문을 불러오는 중...</p>
           </div>
-        ) :
-        // error ? (
-        //   <div className="flex items-center justify-center h-full">
-        //     <p className="text-red-400">{error}</p>
-        //   </div>
-        // ) :
-        sortedQuestions.length > 0 ? (
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-red-400">{error}</p>
+          </div>
+        ) : sortedQuestions.length > 0 ? (
           <QuestionCardStack
             questions={sortedQuestions}
             onCardSelect={handleAnswerClick}
