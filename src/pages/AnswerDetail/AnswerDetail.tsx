@@ -31,7 +31,7 @@ const AnswerDetail = () => {
       } catch (err: unknown) {
         console.error("답변 불러오기 실패:", err);
 
-        // 🟢 임시: 더미 데이터
+        //임시: 더미 데이터
         setAnswers([
           {
             answerId: 1,

@@ -25,6 +25,7 @@ interface Mission {
   missionId: number;
   title: string;
   text: string;
+  missionInstanceId: number;
   image?: string; //추가
   isCompleted: boolean;
   createdAt: string;
@@ -65,9 +66,11 @@ const MPhotoClick = (postId: number) => {
 const AnsClick = (missionId: number) => {
   navigate(`/AnswerDetail/${missionId}`);
 };
-const MisstonClick = (missionId: number) => {
-  navigate(`/MissionDetail/${missionId}`);
+const MisstonClick = (missionInstanceId: number) => {
+  navigate(`/MissionDetail/${missionInstanceId}`);
 };
+
+
 
  // 데이터 로딩 함수 분리
   const loadData = async () => {
@@ -87,14 +90,6 @@ const MisstonClick = (missionId: number) => {
     loadData();
   }, []);
 
-// useEffect(() => {
-//   getMemoryData()
-//     .then(res => {
-//       console.log("Memory 데이터:", res); // ← 여기에 있어야 콘솔에 뜸
-//       setData(res)
-//     })
-//     .catch((err) => console.error("데이터 불러오기 실패:", err));
-// }, []);
 
   return (
     <div className="overflow-y-auto pb-[85px] relative mx-auto w-[390px] bg-white min-h-screen">
@@ -168,24 +163,11 @@ const MisstonClick = (missionId: number) => {
 ))}
 
     {/* 중간 카드 */}
-    {/* {data?.missions.slice(0, 1).map((m) => ( 
-    <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer" onClick={() => MisstonClick(m.missionId)}>
-      <div className="flex items-center h-full p-3">
-        <div className="bg-white rounded-2xl  text-black w-[110px] h-[75px] flex items-center justify-center mr-3">{m.image ? <img src={m.image} alt="post" className="w-full h-full object-cover rounded-2xl" /> : "사진"}</div>
-        <div className="flex flex-col items-start justify-start text-left">
-          <span className="text-[13px] text-[#3A290D]">{m.title}</span>
-          <div className="font-gabia  text-[#454343] text-[12px]">{m.text}</div>
-        </div>
-      </div>
-    </div>
-    ))} */}
-    
-    {/* 중간 카드 */}
 {data?.missions.slice(0, 1).map((m) => ( 
-  <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer" onClick={() => MisstonClick(m.missionId)}>
+  <div key={m.missionId} className="col-span-2 h-24 rounded-2xl bg-[#F3DCCD] cursor-pointer"  onClick={() => MisstonClick(m.missionInstanceId)} >
     <div className="flex items-center h-full p-3">
       <div className="bg-white rounded-2xl text-black w-[110px] h-[75px] flex items-center justify-center mr-3 overflow-hidden">
-        {m.image ? (
+        {/* {m.image ? (
           <img 
             src={`${import.meta.env.VITE_API_BASE_URL}${m.image}`}
             alt="mission" 
@@ -196,7 +178,23 @@ const MisstonClick = (missionId: number) => {
           />
         ) : (
           <div className="text-gray-400">사진</div>
-        )}
+        )} */}
+        {m.image ? (() => {
+  const imageUrl = m.image.startsWith('/')
+    ? `${import.meta.env.VITE_API_BASE_URL}${m.image}`
+    : `${import.meta.env.VITE_API_BASE_URL}/${m.image}`;
+
+  return (
+    <img
+      src={imageUrl}
+      alt="mission"
+      className="w-full h-full object-cover rounded-2xl"
+      onError={() => console.error("이미지 로드 실패:", m.image)}
+    />
+  );
+})() : (
+  <div className="text-gray-400">사진</div>
+)}
       </div>
       <div className="flex flex-col items-start justify-start text-left">
         <span className="text-[13px] text-[#3A290D]">{m.title}</span>
@@ -207,7 +205,7 @@ const MisstonClick = (missionId: number) => {
 ))}
 
     {/* 작은 카드 */}
-    {data?.missions.slice(1).map((m) => (
+    {/* {data?.missions.slice(1).map((m) => (
     <div key={m.missionId} className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer" onClick={() => AnsClick(m.missionId)}>
       <div className="flex items-center h-full p-3">
         <div className="flex flex-col items-start justify-start text-left">
@@ -216,7 +214,29 @@ const MisstonClick = (missionId: number) => {
         </div>
       </div>
     </div>
-    ))}
+    ))} */}
+    {data?.missions.slice(1).map((m) => (
+  <div 
+    key={m.missionId} 
+    className="col-span-1 h-[98px] rounded-2xl bg-[#DFC4B1] cursor-pointer"
+    onClick={() => {
+      if (m.missionInstanceId) {
+        // 미션이면 → MissionDetail
+        MisstonClick(m.missionInstanceId);
+      } else {
+        // 답변이면 → AnswerDetail
+        AnsClick(m.missionId);
+      }
+    }}
+  >
+    <div className="flex items-center h-full p-3">
+      <div className="flex flex-col items-start justify-start text-left">
+        <span className="text-[13px] text-[#3A290D]">{m.title}</span>
+        <div className="font-gabia text-[#454343] text-[11px]">{m.text}</div>
+      </div>
+    </div>
+  </div>
+))}
 
   </div>
 </div>

@@ -89,7 +89,7 @@ const PhotoDetail = () => {
       )}
         </div>
       </div>
-      <div className="pb-[80px] rounded-t-[35px] text-left bg-[#F2E7DF]">
+      <div className="min-h-screen relative mx-auto h-[844px] w-[390px] overflow-hidden rounded-t-[35px] text-left bg-[#F2E7DF]">
         <div className="flex justify-center pt-[15px]">
           <div className="bg-[#DEB99F] w-[39px] h-[6px] rounded-2xl"></div>
         </div>

@@ -79,7 +79,7 @@ const MissionDetail = () => {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     // 이미지 로드 실패 시 기본 텍스트 표시
- console.error('이미지 로드 실패:', submission.image);
+  console.error('이미지 로드 실패:', submission.image);
                   }}
                 />
               ) : (
@@ -91,12 +91,6 @@ const MissionDetail = () => {
           ))
         ) : (
           <>
-            <div className="bg-[#E7E7E7] w-[128px] h-[126px] rounded-2xl text-black flex justify-center items-center">
-              사진
-            </div>
-            <div className="bg-[#E7E7E7] w-[128px] h-[126px] rounded-2xl text-black flex justify-center items-center">
-              사진
-            </div>
           </>
         )}
       </div>
