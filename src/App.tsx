@@ -90,9 +90,9 @@ function App() {
         <Route path={PATHS.mission} element={<MissionPage />} />
         <Route path={PATHS.todayMission} element={<TodayMissionPage />} />
         <Route path="/MissionLog" element={<MissionLog />} />
-        <Route path="/MissionDetail" element={<MissionDetail />} />
-        <Route path="/PhotoDetail" element={<PhotoDetail />} />
-        <Route path="/AnswerDetail" element={<AnswerDetail />} />
+        <Route path="/MissionDetail/:missionId" element={<MissionDetail />} />
+        <Route path="/PhotoDetail/:postId" element={<PhotoDetail />} />
+        <Route path="/AnswerDetail/:customQId" element={<AnswerDetail />} />
         <Route path="/AddPhoto" element={<AddPhoto />} />
 
         {/* 404 → 기본 로그인 화면으로 */}

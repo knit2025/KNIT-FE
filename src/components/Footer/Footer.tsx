@@ -10,9 +10,12 @@ const Footer: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className='fixed bottom-0 m-0 w-[390px] h-[86px] bg-[#FFF7F3] flex justify-center items-center text-center z-100'>
-      <div className='flex justify-center items-center gap-10'>
-        <div>
+    <div className="fixed bottom-0 m-0 w-[390px] h-[86px] bg-[#FFF7F3] flex justify-center items-center text-center z-100">
+      <div className="flex justify-center items-center gap-10">
+        <div className="cursor-pointer"
+          onClick={() => navigate(PATHS.TodayKindness)}
+          role="button"
+          aria-label="오늘의 질문으로 이동">
           <img
             src={fad}
             className="w-[29px] h-[29px] object-contain cursor-pointer"
@@ -32,7 +35,10 @@ const Footer: React.FC = () => {
             카드질문
           </div>
         </div>
-        <div>
+        <div className="cursor-pointer"
+          onClick={() => navigate(PATHS.Home)}
+          role="button"
+          aria-label="홈으로 이동">
           <img
             src={home}
             className="w-[29px] h-[29px] object-contain cursor-pointer"
@@ -41,7 +47,10 @@ const Footer: React.FC = () => {
             홈
           </div>
         </div>
-        <div>
+        <div className="cursor-pointer"
+          onClick={() => navigate(PATHS.missionLog)}
+          role="button"
+          aria-label="보관함으로 이동">
           <img
             src={storage}
             className="w-[29px] h-[29px] object-contain cursor-pointer"
