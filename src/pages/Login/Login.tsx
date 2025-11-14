@@ -5,7 +5,7 @@ import knitLogo from "../../assets/login-knit-logo.png";
 import "../../styles/Global.css";
 import axios from "axios";
 import { useState } from "react";
-import { getFamily } from "../../api/family";
+import { getFamily, type FamilyMember } from "../../api/family";
 import { useNavigate } from "react-router-dom";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -66,14 +66,16 @@ const Login: React.FC = () => {
       try {
         const family = await getFamily();
         const map: Record<number, string> = {};
-        (family.users as any[]).forEach((u: any) => {
-          map[Number(u.id)] = String(u.role);
+        family.users.forEach((u: FamilyMember) => {
+          map[u.id] = u.role;
         });
         localStorage.setItem("userRoleMap", JSON.stringify(map));
 
         // 현재 사용자 ID도 저장 시도 (loginId 매칭되는 항목이 있으면)
         const loginIdStored = localStorage.getItem("loginId");
-        const me = (family.users as any[]).find((u: any) => u.loginId === loginIdStored);
+        const me = (family.users as Array<FamilyMember & { loginId?: string }>).find(
+          (u) => u.loginId === loginIdStored
+        );
         if (me?.id != null) localStorage.setItem("currentUserId", String(me.id));
       } catch (e) {
         console.warn("가족 정보 저장 스킵:", e);

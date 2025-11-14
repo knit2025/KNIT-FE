@@ -49,8 +49,16 @@ export const QuestionCard = ({
       {/* 헤더 */}
         <div className="flex justify-between mb-[25px]">
           <h3 className="text-[13px] font-semibold tracking-[0.05em] text-brand">
-            {question.authorRole}
-            {josaIGA(question.authorRole)} {question.targetRole} 궁금한 점
+            {question.revealAuthor ? (
+              <>
+                {question.authorRole}
+                {josaIGA(question.authorRole)} {question.targetRole} 궁금한 점
+              </>
+            ) : (
+              <>
+                {question.targetRole} 궁금한 점
+              </>
+            )}
           </h3>
           {!editable && showAnswerButton && (
             <button

@@ -8,6 +8,7 @@ interface QuestionCardResponse {
   toUserId?: number | null;
   fromUser?: string; // ex) "딸"
   toUser?: string;   // ex) "엄마" or "모두"
+  displayFromName?: string; // ex) "익명"일 수 있음
   text: string;
   isAnswered: boolean;
   isPublic: boolean;
@@ -38,7 +39,10 @@ export const mapApiToQuestion = (apiData: QuestionCardResponse): Question => {
   try {
     const raw = localStorage.getItem('userRoleMap');
     if (raw) roleMap = JSON.parse(raw);
-  } catch {}
+  } catch {
+    console.warn('userRoleMap 파싱 실패, 기본값 사용');
+    roleMap = {};
+  }
 
   const authorRoleName =
     (apiData.fromUserId != null ? roleMap[apiData.fromUserId] : undefined) || apiData.fromUser || '기타';
@@ -51,6 +55,9 @@ export const mapApiToQuestion = (apiData: QuestionCardResponse): Question => {
       ? '모두에게'
       : (`${toRoleName}에게` as QuestionTarget);
 
+  // 익명 여부: displayFromName 또는 fromUser 값이 '익명'인 경우로 판단
+  const isAnonymous = apiData.displayFromName === '익명' || apiData.fromUser === '익명';
+
   return {
     id: apiData.customQId.toString(),
     authorRole,
@@ -58,7 +65,7 @@ export const mapApiToQuestion = (apiData: QuestionCardResponse): Question => {
     title: '',
     content: apiData.text,
     answer: apiData.isAnswered ? '' : undefined,
-    revealAuthor: true,
+    revealAuthor: !isAnonymous,
     publicToAll: apiData.isPublic,
     createdAt: new Date(),
     fromUserId: apiData.fromUserId,
@@ -213,6 +220,15 @@ interface QuestionAnswerResponse {
  * @returns {Promise<QuestionAnswerResponse>} 답변 정보
  * @throws {Error} 인증 실패, 질문 없음, 기타 에러
  */
+type AnswerItem = {
+  content?: string;
+  displayName?: string;
+  nickname?: string;
+  username?: string;
+  updatedAt?: string;
+  createdAt?: string;
+};
+
 export const getQuestionAnswer = async(customQId: string): Promise<QuestionAnswerResponse> => {
   const url = `${API_BASE_URL}/customqa/${customQId}/answers/`;
   const headers = getAuthHeaders();
@@ -251,10 +267,10 @@ export const getQuestionAnswer = async(customQId: string): Promise<QuestionAnswe
     // 2. items 배열 스펙
     else if (Array.isArray(raw?.items) && raw.items.length > 0) {
       // 가장 최근 항목을 사용 (updatedAt/createdAt 기준)
-      const items = raw.items as Array<any>;
-      const pick = [...items].sort((a, b) => {
-        const ta = Date.parse(a?.updatedAt ?? a?.createdAt ?? 0);
-        const tb = Date.parse(b?.updatedAt ?? b?.createdAt ?? 0);
+      const items = raw.items as Array<AnswerItem>;
+      const pick = [...items].sort((a: AnswerItem, b: AnswerItem) => {
+        const ta = Date.parse(a?.updatedAt ?? a?.createdAt ?? '0');
+        const tb = Date.parse(b?.updatedAt ?? b?.createdAt ?? '0');
         return tb - ta;
       })[0];
       normalized = {

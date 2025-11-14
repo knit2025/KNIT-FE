@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
 import { QuestionCardStack } from '../components/QuestionCard/QuestionCardStack';
 import type { Question, FamilyRole } from '../types/question';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, type Location } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import PlusIcon from '../assets/add 2.png'
 import { PATHS } from '../routes';
 import Footer from '../components/Footer/Footer';
 import { getQuestionCards, mapApiToQuestion, getQuestionAnswer } from '../api/questions';
-import { getCurrentUserRole } from '../api/config';
 import { useMemo } from 'react';
 
 
 export const QuestionListPage = () => {
   const navigate = useNavigate();
-  const location = useLocation() as any; // state + pathname 접근 단순 캐스팅
+  const location = useLocation() as Location & { state?: { newQuestion?: Question } };
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,20 +48,20 @@ export const QuestionListPage = () => {
           return;
         }
 
-        // API 데이터를 Question 타입으로 변환하고 답변 가져오기
+        // API 데이터를 Question 타입으로 변환하고, 가능한 경우 답변을 조회하여 주입
         const questionsWithAnswers = await Promise.all(
           data.map(async (apiData) => {
             const question = mapApiToQuestion(apiData);
 
-            // isAnswered가 true인 경우에만 답변 조회
-            if (apiData.isAnswered) {
-              try {
-                const answerData = await getQuestionAnswer(question.id);
+            try {
+              const answerData = await getQuestionAnswer(question.id);
+              if (answerData?.answerText) {
                 question.answer = answerData.answerText;
                 question.answeredBy = answerData.answerBy as FamilyRole;
-              } catch (err) {
-                console.error(`질문 ${question.id}의 답변 조회 실패:`, err);
               }
+            } catch {
+              // 404 등 답변이 없으면 무시하고 진행
+              // console.debug(`답변 없음 또는 조회 실패(${question.id}):`, err);
             }
 
             return question;

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { QuestionTarget, CreateQuestionForm } from '../types/question';
+import type { CreateQuestionForm } from '../types/question';
 import Header from '../components/Header/Header';
 import SectionCard from '../components/Question/SectionCard';
 import OptionGroup, { YesNoGroup, type OptionItem } from '../components/Question/OptionGroup';

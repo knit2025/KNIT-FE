@@ -137,6 +137,26 @@ export const QuestionCardStack = ({
           const zIndexOrder = isFocused ? 50 : baseZ;
           const transform = `translateY(${translateY}px)` + (isFocused ? ' scale(1.02)' : '');
 
+          // CSS 변수 포함한 스타일 타입 정의
+          type CustomStyle = React.CSSProperties & {
+            ['--overlay-opacity']?: string;
+            ['--overlay-color']?: string;
+          };
+
+          const styleObj: CustomStyle = {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            maxWidth: '340px',
+            transform,
+            zIndex: zIndexOrder,
+            opacity: cardOpacity,
+            transition: 'all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)',
+            ['--overlay-opacity']: isFocused ? '0' : String(overlayOpacity),
+            ['--overlay-color']: overlayColor,
+          };
+
           return (
             <QuestionCard
               key={question.id}
@@ -144,19 +164,7 @@ export const QuestionCardStack = ({
               onClick={() => (focusedId === question.id ? onCardSelect(question) : setFocusedId(question.id))}
               onAnswerClick={() => onCardSelect(question)}
               showAnswerButton={canAnswerQuestion ? canAnswerQuestion(question) : true}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%', // 흐름형 레이아웃: 부모 너비에 맞춤
-                maxWidth: '340px', // 최대 너비 제한
-                transform,
-                zIndex: zIndexOrder,
-                opacity: cardOpacity,
-                transition: 'all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)', // 더 부드러운 애니메이션
-                ['--overlay-opacity' as any]: isFocused ? '0' : String(overlayOpacity),
-                ['--overlay-color' as any]: overlayColor,
-              }}
+              style={styleObj}
               className={`
                 ${isFocused ? 'shadow-2xl' : offset === 0 ? 'shadow-xl' : 'shadow-md'}
                 ${!isVisible && offset !== -1 && offset !== 4 ? 'pointer-events-none' : ''}

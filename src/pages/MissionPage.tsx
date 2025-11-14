@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
 import missionMarker from "../assets/missionMarker.svg";
@@ -6,12 +6,7 @@ import { PATHS } from '../routes';
 import { useNavigate } from 'react-router-dom';
 import { getTodayMission, getCompletedMissions, checkCurrentUserSubmittedById, type TodayMissionResponse, type CompletedMission } from '../api/missions';
 
-interface Mission {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-}
+// Mission interface was unused; removed to satisfy TS/ESLint
 
 export const MissionPage = () => {
   const navigate = useNavigate();
@@ -21,18 +16,6 @@ export const MissionPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [localMissionCompleted, setLocalMissionCompleted] = useState(false);
-  const currentUserId = useMemo(() => {
-    const fromKey = localStorage.getItem('currentUserId');
-    if (fromKey) return Number(fromKey);
-    try {
-      const u = localStorage.getItem('user');
-      if (u) {
-        const parsed = JSON.parse(u);
-        if (parsed?.id != null) return Number(parsed.id);
-      }
-    } catch {}
-    return undefined;
-  }, []);
 
   useEffect(() => {
     const fetchMissions = async () => {
