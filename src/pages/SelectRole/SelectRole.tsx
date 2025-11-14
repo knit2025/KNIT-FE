@@ -12,7 +12,7 @@ type LocationState = {
   password: string;
   name: string;
   birth: string;
-  familyCode: string;
+  familyCode?: string;
 };
 
 const SelectRole: React.FC = () => {
@@ -22,6 +22,7 @@ const SelectRole: React.FC = () => {
 
   const [role, setRole] = useState<string>("");
   const [nickname, setNickname] = useState<string>("");
+  const [inviteCode, setInviteCode] = useState<string>(state.familyCode ?? "");
 
   const handleSignUp = async () => {
     await axios.post(`${API}/accounts/signup`, {
@@ -97,8 +98,10 @@ const SelectRole: React.FC = () => {
           label="서로의 하루가 이어질 준비가 되었어요."
           placeholder="가족 초대 코드"
           bgColor="bg-[#EBD5C3]"
-          value={state.familyCode}
-          onChange={() => {}}
+          value={inviteCode}
+          onChange={(e) => {
+            setInviteCode(e.target.value);
+          }}
         />
       </div>
       <div className="mt-20 mb-20">

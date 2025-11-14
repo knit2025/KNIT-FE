@@ -3,17 +3,34 @@ import SignupBtn from "../../components/SignUp/SignupBtn";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const API = "https://junhong.shop";
 
+type SignupLocationState = {
+  loginId?: string;
+  password?: string;
+  passwordConfirm?: string;
+  name?: string;
+  birth?: string;
+  familyCode?: string | null;
+};
+
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
-  const [loginId, setLoginId] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [name, setName] = useState("");
-  const [birth, setBirth] = useState("");
-  const [familyCode, setFamilyCode] = useState<string | null>(null);
+  const location = useLocation();
+  const prevState = (location.state as SignupLocationState) ?? {};
+
+  const [loginId, setLoginId] = useState(prevState.loginId ?? "");
+  const [password, setPassword] = useState(prevState.password ?? "");
+  const [passwordConfirm, setPasswordConfirm] = useState(
+    prevState.passwordConfirm ?? ""
+  );
+  const [name, setName] = useState(prevState.name ?? "");
+  const [birth, setBirth] = useState(prevState.birth ?? "");
+  const [familyCode, setFamilyCode] = useState<string | null>(
+    prevState.familyCode ?? null
+  );
   const [idMessage, setIdMessage] = useState<string | null>(null);
 
   const handleCheckId = async () => {
@@ -37,12 +54,27 @@ const SignUp: React.FC = () => {
     setFamilyCode(res.data.familyCode);
 
     setFamilyCode(res.data.familyCode);
-    navigate("/familyCode", { state: { familyCode: res.data.familyCode } });
+    navigate("/familyCode", {
+      state: {
+        loginId,
+        password,
+        passwordConfirm,
+        name,
+        birth,
+        familyCode: res.data.familyCode,
+      },
+    });
   };
 
   const goToSelectRole = () => {
     navigate("/selectRole", {
-      state: { loginId, password, name, birth, familyCode },
+      state: {
+        loginId,
+        password,
+        name,
+        birth,
+        ...(familyCode ? { familyCode } : {}),
+      },
     });
   };
 
