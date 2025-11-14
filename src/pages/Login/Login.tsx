@@ -13,17 +13,47 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [loginId, setLoginId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginId(e.target.value);
+  };
+
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
 
   const handleLogin = async () => {
     try {
+      setErrorMessage(null);
       const response = await axios.post(`${API}/accounts/login`, {
         loginId,
         password,
       });
-      console.log("로그인 성공", response.data);
+      const { access, loginId: returnedId } = response.data;
+
+      if (!access) {
+        throw new Error("access 토큰이 없습니다.");
+      }
+      localStorage.setItem("accessToken", access);
+      if (returnedId) {
+        localStorage.setItem("loginId", returnedId);
+      }
+
+      setLoginId("");
+      setPassword("");
       navigate("/home");
-    } catch {
-      console.error("로그인 실패");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const detail = error.response?.data?.detail;
+        if (status === 400) {
+          const message = detail || "";
+          setErrorMessage(message);
+        } else {
+          setErrorMessage("로그인에 실패했습니다.");
+        }
+      }
     }
   };
 
@@ -46,15 +76,18 @@ const Login: React.FC = () => {
             type="text"
             fieldName="아이디 입력"
             value={loginId}
-            onChange={(e) => setLoginId(e.target.value)}
+            onChange={handleId}
           ></InputField>
           <InputField
             type="password"
             fieldName="비밀번호 입력"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePassword}
           ></InputField>
         </div>
+        {errorMessage && (
+          <p className="mt-3 text-xs text-red-500 font-sans">{errorMessage}</p>
+        )}
         <div className=" flex flex-col gap-4 space-y-2 font-sans font-bold mt-4 mb-20 ">
           <Button buttonName="로그인" onClick={handleLogin}></Button>
           <Button buttonName="회원가입" onClick={goToSignUp}></Button>
