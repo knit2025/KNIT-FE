@@ -98,9 +98,11 @@ const MisstonClick = (missionInstanceId: number) => {
       const res = await getMemoryData();
 
       // missions 배열에 대표 이미지 추가 (userSubmissions 중 첫 번째 있는 이미지)
-      const missionsWithImage = res.missions.map((m: any) => ({
+      type Submission = { image?: string };
+      type MissionWithSubs = Mission & { userSubmissions?: Submission[] };
+      const missionsWithImage = res.missions.map((m: MissionWithSubs) => ({
         ...m,
-        image: m.userSubmissions?.find((u: any) => u.image)?.image || undefined,
+        image: m.userSubmissions?.find((u: Submission) => u.image)?.image || undefined,
       }));
 
       setData({ ...res, missions: missionsWithImage });

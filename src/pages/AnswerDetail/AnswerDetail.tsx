@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import KNITLG from "../../assets/Knit.png";
 import "../../styles/Global.css";
-import { getQuestionAnswers } from "../../lib/api/question";
 import axios from "axios";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -15,7 +14,6 @@ interface Answer {
   content: string;
   createdAt: string;
   isAnonymous?: boolean;
-  text: string;
 }
 
 const AnswerDetail = () => {
@@ -41,7 +39,14 @@ useEffect(() => {
       });
 
       //익명 처리
-      const processedAnswers: Answer[] = res.data.answers.map((a: any) => ({
+      type ApiAnswer = {
+        answerId: number;
+        userName: string;
+        content: string;
+        createdAt: string;
+        isAnonymous?: boolean;
+      };
+      const processedAnswers: Answer[] = (res.data.answers as ApiAnswer[]).map((a) => ({
         ...a,
         userName: a.isAnonymous ? "익명" : a.userName,
       }));
@@ -71,10 +76,13 @@ useEffect(() => {
       <div className="pr-[23px] pl-[23px] mb-1">
         <div className="w-[342px] max-h-[495px] min-h-[200px] pb-[30px] bg-[#E6D0C1] text-left rounded-2xl text-black">
           <div className="ml-[23px] mr-[23px]">
-            <div className="text-[#3A290D] font-bold pt-[28px]">
-              {answers.text}
-            </div>
-          {answers.length > 0 ? (
+            {loading && (
+              <div className="text-[#A9927F] pt-[28px]">불러오는 중...</div>
+            )}
+            {error && !loading && (
+              <div className="text-red-500 pt-[28px]">{error}</div>
+            )}
+          {!loading && !error && (answers.length > 0 ? (
               answers.map((answer) => (
                 <div key={answer.answerId} className="pt-2.5">
                   <div className="text-[13px] font-gabia text-[#3A290D] mb-2 mt-5">
@@ -89,7 +97,7 @@ useEffect(() => {
               <div className="text-center text-[#A9927F] mt-10">
                 아직 답변이 없습니다.
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
