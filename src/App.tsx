@@ -25,7 +25,6 @@ import Home from "./pages/Home/Home";
 import { QuestionListPage } from "./pages/QuestionListPage";
 import { QuestionDetailPage } from "./pages/QuestionDetailPage";
 import { CreateQuestionPage } from "./pages/CreateQuestionPage";
-import { TempPage } from "./pages/TempPage";
 import { PATHS } from "./routes";
 
 // ── [develop 브랜치] 미션/포토/답변 페이지
@@ -75,8 +74,25 @@ function App() {
         {/* 기본 진입은 로그인 화면으로 리다이렉트 (비로그인 사용자용) */}
         <Route path="/" element={<Navigate to="/Login" replace />} />
 
-
         {/* 로그인 & 회원가입 - 인증 불필요 */}
+        <Route path="/Login" element={
+            <Login />
+        } />
+        <Route path="/SignUp" element={
+            <SignUp />
+        } />
+        <Route path="/FamilyCode" element={
+            <FamilyCode />
+        } />
+        <Route path="/SelectRole" element={
+            <SelectRole />
+        } />
+        <Route path="/SignUp" element={
+            <SignUp />
+        } />
+        <Route path="/Knitting" element={
+            <Knitting />
+        } />
         {/* 홈 (로그인 필요) */}
         <Route path="/Home" element={
           <ProtectedRoute>
@@ -93,11 +109,6 @@ function App() {
         <Route path={PATHS.createQuestion} element={
           <ProtectedRoute>
             <CreateQuestionPage />
-          </ProtectedRoute>
-        } />
-        <Route path={PATHS.temp} element={
-          <ProtectedRoute>
-            <TempPage />
           </ProtectedRoute>
         } />
         <Route path={PATHS.answer()} element={

@@ -79,7 +79,7 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="w-[390px] h-screen flex flex-col items-center bg-white">
+    <div className="relative mx-auto w-[390px] h-screen flex flex-col items-center bg-white">
       <h1 className="text-[#3A290D] font-sans text-[1.5rem] font-semibold pt-20 pb-10">
         회원가입
       </h1>

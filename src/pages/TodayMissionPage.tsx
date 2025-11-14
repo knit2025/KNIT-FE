@@ -4,6 +4,7 @@ import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
 import { getTodayMission, submitMission } from "../api/missions";
 import { PATHS } from "../routes";
+import { setMissionCompleted, isMissionCompletedToday } from "../utils/missionStorage";
 import type { ChangeEvent } from "react";
 
 export const TodayMissionPage = () => {
@@ -20,6 +21,14 @@ export const TodayMissionPage = () => {
     const fetchTodayMission = async () => {
       try {
         setLoading(true);
+
+        // 로컬 스토리지에서 오늘 미션 완료 여부 확인
+        if (isMissionCompletedToday()) {
+          alert('이미 오늘의 미션을 완료했습니다');
+          navigate(PATHS.mission);
+          return;
+        }
+
         const mission = await getTodayMission();
         setMissionInstanceId(mission.missionInstanceId);
         setMissionTitle(mission.content);
@@ -57,6 +66,9 @@ export const TodayMissionPage = () => {
       const result = await submitMission(missionInstanceId, comment, photo);
 
       if (result.isCompleted) {
+        // 로컬 스토리지에 미션 완료 상태 저장 (자정에 자동 초기화됨)
+        setMissionCompleted();
+
         alert('미션이 성공적으로 제출되었습니다!');
         navigate(PATHS.mission);
       }
