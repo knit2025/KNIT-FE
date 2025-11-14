@@ -37,6 +37,7 @@ type AnswerList = {
 
 const TodayKindness: React.FC = () => {
   const [familyList, setFamilyList] = useState<string[]>([]);
+  const [familyMembers, setFamilyMembers] = useState<familyUser[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [question, setQuestion] = useState<string>("");
   const [instanceId, setInstanceId] = useState<number | null>(null);
@@ -53,11 +54,10 @@ const TodayKindness: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const memberNames = res.data.users.map(
-        (user: familyUser) => user.role || user.nickname
-      );
+      const members = res.data.users;
+      setFamilyMembers(members);
 
-      setFamilyList(memberNames);
+      setFamilyList(members.map((user: familyUser) => user.role));
     } catch (err) {
       console.error("가족 구성원 불러오기 실패:", err);
     }
@@ -93,6 +93,7 @@ const TodayKindness: React.FC = () => {
       const data = res.data;
 
       const answerMap: Record<string, string> = {};
+
       data.answers.forEach((item) => {
         answerMap[item.userName] = item.content;
       });
@@ -106,8 +107,13 @@ const TodayKindness: React.FC = () => {
     }
   };
 
-  const handleSave = async (name: string, text: string) => {
-    setAnswers((prev) => ({ ...prev, [name]: text }));
+  const handleSave = async (role: string, text: string) => {
+    const member = familyMembers.find((m) => m.role === role);
+    if (!member) return;
+
+    const userNameKey = member.name;
+
+    setAnswers((prev) => ({ ...prev, [userNameKey]: text }));
 
     if (!instanceId) {
       return;
@@ -129,6 +135,7 @@ const TodayKindness: React.FC = () => {
         }
       );
       console.log("답변 저장 성공:", res.data);
+      await fetchAnswerList(instanceId);
     } catch (err) {
       console.error("답변 저장 실패:", err);
     }
@@ -160,8 +167,6 @@ const TodayKindness: React.FC = () => {
         setInstanceId(data.instanceId);
 
         await fetchFamilyMembers();
-
-        await fetchAnswerList(data.instanceId);
         // setQuestionInfo(data);
       } catch (err) {
         console.error("오늘의 질문 불러오기 실패:", err);
@@ -173,6 +178,12 @@ const TodayKindness: React.FC = () => {
 
     fetchTodayQuestion();
   }, []);
+
+  useEffect(() => {
+    if (instanceId && familyMembers.length > 0) {
+      fetchAnswerList(instanceId);
+    }
+  }, [instanceId, familyMembers]);
 
   return (
     <div className="relative mx-auto w-[390px] h-screen overflow-hidden flex flex-col items-center bg-white">
@@ -186,14 +197,18 @@ const TodayKindness: React.FC = () => {
         </p>
       )}
       <div className="flex flex-col items-center w-full">
-        {familyList.map((name) => (
-          <KindnessBox
-            key={name}
-            family={name}
-            content={answers[name] || ""}
-            onSave={handleSave}
-          />
-        ))}
+        {familyList.map((role) => {
+          const member = familyMembers.find((m) => m.role === role);
+          const userNameKey = member?.name ?? "";
+          return (
+            <KindnessBox
+              key={role}
+              family={role}
+              content={answers[userNameKey] || ""}
+              onSave={handleSave}
+            />
+          );
+        })}
       </div>
       <Footer />
     </div>
